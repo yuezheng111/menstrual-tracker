@@ -1,0 +1,55 @@
+<view class="page-record">
+  <view class="page-header">
+    <text class="page-title">📝 记录经期</text>
+    <text class="page-desc" wx:if="{{!isEditing}}">记录你的身体状态，获取更准确的预测</text>
+  </view>
+  <scroll-view class="form-scroll" scroll-y enhanced scroll-with-animation>
+    <glass-card customClass="form-section">
+      <view class="section-title">📅 日期</view>
+      <view class="date-row">
+        <picker mode="date" value="{{form.startDate}}" bindchange="onStartDateChange">
+          <view class="date-box"><text class="date-lbl">开始</text><text class="date-val {{form.startDate ? '' : 'empty'}}">{{form.startDate || '选择'}}</text></view>
+        </picker>
+        <text class="date-sep">~</text>
+        <picker mode="date" value="{{form.endDate}}" bindchange="onEndDateChange">
+          <view class="date-box"><text class="date-lbl">结束</text><text class="date-val {{form.endDate ? '' : 'empty'}}">{{form.endDate || '选择'}}</text></view>
+        </picker>
+      </view>
+    </glass-card>
+    <glass-card customClass="form-section">
+      <view class="section-title">💧 经量</view>
+      <view class="chip-row">
+        <view wx:for="{{flowOptions}}" wx:key="value" class="chip {{form.flow === item.value ? 'active' : ''}}" bindtap="selectFlow" data-value="{{item.value}}"><text>{{item.emoji}} {{item.label}}</text></view>
+      </view>
+    </glass-card>
+    <glass-card customClass="form-section">
+      <view class="section-title">😣 痛经程度</view>
+      <view class="chip-row">
+        <view wx:for="{{painOptions}}" wx:key="value" class="chip {{form.painLevel === item.value ? 'active' : ''}}" bindtap="selectPain" data-value="{{item.value}}"><text>{{item.emoji}} {{item.label}}</text></view>
+      </view>
+    </glass-card>
+    <glass-card customClass="form-section">
+      <view class="section-title">🤒 症状</view>
+      <view class="chip-row">
+        <view wx:for="{{symptomOptions}}" wx:for-index="idx" wx:for-item="item" wx:key="*this" class="chip-sm {{symptomActive[idx] ? 'active' : ''}}" bindtap="toggleSymptom" data-value="{{item}}">{{item}}</view>
+      </view>
+    </glass-card>
+    <glass-card customClass="form-section">
+      <view class="section-title">😊 情绪</view>
+      <view class="chip-row">
+        <view wx:for="{{moodOptions}}" wx:for-index="idx" wx:for-item="item" wx:key="*this" class="chip-sm {{moodActive[idx] ? 'active' : ''}}" bindtap="toggleMood" data-value="{{item}}">{{item}}</view>
+      </view>
+    </glass-card>
+    <glass-card customClass="form-section">
+      <view class="section-title">📋 其他</view>
+      <view class="switch-row"><text>血块</text><switch checked="{{form.clots}}" bindchange="onClotsChange" color="#ec407a" /></view>
+      <textarea class="input-glass" placeholder="备注（可记录身体感受、用药等）" value="{{form.notes}}" bindinput="onNotesInput" style="margin-top:14px;height:80px;resize:none" />
+    </glass-card>
+    <view style="margin:20px 20px 40px">
+      <cute-btn text="{{isEditing ? '保存修改' : '保存记录'}}" block="{{true}}" loading="{{saving}}" bindtap="saveRecord" />
+    </view>
+  </scroll-view>
+  <view wx:if="{{isEditing}}" style="margin-top:8px;text-align:center">
+    <text style="font-size:14px;color:#e53935;padding:8px 20px;display:inline-block" bindtap="confirmDelete">🗑️ 删除这条记录</text>
+  </view>
+</view>

@@ -1,0 +1,47 @@
+.page-stats {
+  padding: 0 16px;
+}
+.load-state { text-align: center; padding: 60px 0; color: #8e5580; font-size: 14px; }
+.empty-state { text-align: center; padding: 60px 24px; margin-top: 40px; }
+.empty-emoji { font-size: 56px; margin-bottom: 12px; }
+.empty-text { font-size: 18px; font-weight: 600; color: #4a154b; }
+.empty-desc { font-size: 14px; color: #8e5580; margin-top: 6px; }
+
+/* Stats grid */
+.stats-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.stat-card { flex: 1 1 calc(50% - 4px); padding: 18px; text-align: center; min-width: calc(50% - 4px); }
+.stat-val { display: block; font-size: 24px; font-weight: 700; color: #ec407a; }
+.stat-lbl { display: block; font-size: 12px; color: #8e5580; margin-top: 4px; }
+
+/* Sections */
+.section-card { margin-bottom: 10px; padding: 18px 20px !important; }
+.section-title { font-size: 15px; font-weight: 600; color: #4a154b; margin-bottom: 12px; }
+
+/* Range grid */
+.range-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.range-grid view { flex: 1 1 calc(50% - 4px); text-align: center; padding: 10px; background: rgba(255,255,255,0.12); border-radius: 12px; }
+.range-val { display: block; font-size: 20px; font-weight: 700; color: #ec407a; }
+.range-lbl { display: block; font-size: 12px; color: #8e5580; margin-top: 2px; }
+
+/* Prediction */
+.pred-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.pred-row:last-child { border-bottom: none; }
+.pred-lbl { font-size: 14px; color: #8e5580; }
+.pred-val { font-size: 14px; font-weight: 500; color: #4a154b; }
+
+/* Cycles */
+.cycle-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.cycle-row:last-child { border-bottom: none; }
+.cycle-date { font-size: 14px; font-weight: 500; color: #4a154b; }
+.cycle-period { font-size: 12px; color: #ec407a; background: rgba(236,64,122,0.1); padding: 1px 8px; border-radius: 8px; }
+.cycle-len { font-size: 12px; color: #8e5580; margin-left: auto; }
+
+/* Symptoms */
+.symptom-row { display: flex; align-items: center; padding: 8px 0; gap: 12px; }
+.symptom-info { flex: 1; }
+.symptom-name { display: block; font-size: 14px; color: #4a154b; margin-bottom: 4px; }
+.symptom-bar-bg { height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
+.symptom-bar { height: 100%; background: linear-gradient(90deg, #f06292, #ce93d8); border-radius: 4px; transition: width 0.6s ease; }
+.symptom-count { font-size: 12px; color: #8e5580; white-space: nowrap; }
+
+.no-data { text-align: center; padding: 20px; color: #c89bb8; font-size: 13px; }

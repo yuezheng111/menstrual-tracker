@@ -1,0 +1,77 @@
+<view class="page-stats">
+  <view class="page-header">
+    <text class="page-title">📊 统计分析</text>
+  </view>
+
+  <!-- Loading -->
+  <view wx:if="{{loading}}" class="load-state">加载中...</view>
+
+  <!-- Empty -->
+  <view wx:elif="{{!hasData}}" class="empty-state glass">
+    <view class="empty-emoji">📊</view>
+    <view class="empty-text">暂无数据</view>
+    <view class="empty-desc">记录经期后即可查看统计</view>
+  </view>
+
+  <!-- Content -->
+  <view wx:else>
+    <!-- Stats Grid -->
+    <view class="stats-grid">
+      <view class="stat-card glass"><text class="stat-val">{{overview.totalRecords || 0}}</text><text class="stat-lbl">总记录</text></view>
+      <view class="stat-card glass"><text class="stat-val">{{overview.totalCycles || 0}}</text><text class="stat-lbl">总周期</text></view>
+      <view class="stat-card glass"><text class="stat-val">{{overview.avgCycleLength ? overview.avgCycleLength.toFixed(1) + "天" : "-"}}</text><text class="stat-lbl">平均周期</text></view>
+      <view class="stat-card glass"><text class="stat-val">{{overview.avgPeriodLength ? overview.avgPeriodLength.toFixed(1) + "天" : "-"}}</text><text class="stat-lbl">平均经期</text></view>
+    </view>
+
+    <!-- Range -->
+    <glass-card customClass="section-card">
+      <view class="section-title">📏 周期范围</view>
+      <view class="range-grid">
+        <view><text class="range-val">{{overview.minCycleLength || "-"}}</text><text class="range-lbl">最短周期</text></view>
+        <view><text class="range-val">{{overview.maxCycleLength || "-"}}</text><text class="range-lbl">最长周期</text></view>
+        <view><text class="range-val">{{overview.minPeriodLength || "-"}}</text><text class="range-lbl">最短经期</text></view>
+        <view><text class="range-val">{{overview.maxPeriodLength || "-"}}</text><text class="range-lbl">最长经期</text></view>
+      </view>
+    </glass-card>
+
+    <!-- Prediction -->
+    <glass-card customClass="section-card">
+      <view class="section-title">🔮 预测信息</view>
+      <view class="pred-row"><text class="pred-lbl">下次经期</text><text class="pred-val">{{overview.nextPredictedStart || "-"}} ~ {{overview.nextPredictedEnd || "-"}}</text></view>
+      <view class="pred-row"><text class="pred-lbl">排卵日</text><text class="pred-val">{{overview.ovulationStart || "-"}} ~ {{overview.ovulationEnd || "-"}}</text></view>
+      <view class="pred-row"><text class="pred-lbl">易孕期</text><text class="pred-val">{{overview.fertileWindowStart || "-"}} ~ {{overview.fertileWindowEnd || "-"}}</text></view>
+      <view class="pred-row"><text class="pred-lbl">安全期</text><text class="pred-val">{{overview.safePeriodStart || "-"}} ~ {{overview.safePeriodEnd || "-"}}</text></view>
+    </glass-card>
+
+    <!-- Recent Cycles -->
+    <glass-card customClass="section-card">
+      <view class="section-title">📅 近期周期</view>
+      <view wx:if="{{overview.recentCycles && overview.recentCycles.length > 0}}">
+        <view wx:for="{{overview.recentCycles}}" wx:key="startDate" class="cycle-row">
+          <text class="cycle-date">{{item.startDate}}</text>
+          <text class="cycle-period">{{item.periodLength || "-"}}天</text>
+          <text wx:if="{{item.cycleLength}}" class="cycle-len">{{item.cycleLength}}天周期</text>
+        </view>
+      </view>
+      <view wx:else class="no-data">暂无周期数据</view>
+    </glass-card>
+
+    <!-- Symptoms -->
+    <glass-card customClass="section-card">
+      <view class="section-title">🤒 常见症状</view>
+      <view wx:if="{{overview.topSymptoms && overview.topSymptoms.length > 0}}">
+        <view wx:for="{{overview.topSymptoms}}" wx:key="name" class="symptom-row">
+          <view class="symptom-info">
+            <text class="symptom-name">{{item.name}}</text>
+            <view class="symptom-bar-bg"><view class="symptom-bar" style="width:{{item.percentage}}%"></view></view>
+          </view>
+          <text class="symptom-count">{{item.count}}次</text>
+        </view>
+      </view>
+      <view wx:else class="no-data">暂无症状数据</view>
+    </glass-card>
+
+    <!-- Bottom space -->
+    <view style="height:30px"></view>
+  </view>
+</view>

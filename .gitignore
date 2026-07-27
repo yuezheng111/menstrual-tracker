@@ -1,0 +1,16 @@
+*.class
+*.jar
+*.war
+*.log
+target/
+.idea/
+*.iml
+.DS_Store
+node_modules/
+dist/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+temp_gen.py
+generate_files.py

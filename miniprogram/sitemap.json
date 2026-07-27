@@ -1,0 +1,4 @@
+{
+  "desc": "\u5173\u4e8e\u672c\u7ad9\u70b9\u5730\u56fe",
+  "rules": [{ "action": "allow", "page": "*" }]
+}

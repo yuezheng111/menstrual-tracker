@@ -1,0 +1,126 @@
+.page-record {
+  padding: 0 16px 0;
+}
+
+.page-header {
+  padding: 20px 0 16px;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #4a154b;
+}
+.page-desc {
+  font-size: 13px;
+  color: #8e5580;
+  margin-top: 4px;
+  display: block;
+}
+
+.form-scroll {
+  height: calc(100vh - 100px);
+}
+
+/* Section */
+.form-section {
+  margin-bottom: 12px;
+  padding: 16px 18px !important;
+}
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #4a154b;
+  margin-bottom: 12px;
+}
+
+/* Date picker */
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.date-box {
+  flex: 1;
+  text-align: center;
+  padding: 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.date-lbl {
+  display: block;
+  font-size: 12px;
+  color: #8e5580;
+  margin-bottom: 4px;
+}
+.date-val {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a154b;
+}
+.date-val.empty {
+  color: #c89bb8;
+  font-weight: 400;
+}
+.date-sep {
+  font-size: 18px;
+  color: #c89bb8;
+}
+
+/* Chips */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.chip {
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  color: #8e5580;
+  border: 1px solid rgba(255,255,255,0.20);
+  transition: all 0.2s;
+}
+.chip.active {
+  background: linear-gradient(135deg, #f06292, #ce93d8);
+  color: white;
+  border-color: transparent;
+}
+.chip-sm {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  color: #8e5580;
+  border: 1px solid rgba(255,255,255,0.20);
+}
+.chip-sm.active {
+  background: linear-gradient(135deg, #f06292, #ce93d8);
+  color: white;
+  border-color: transparent;
+}
+
+/* Switch */
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  color: #4a154b;
+}
+
+/* Input override */
+.input-glass {
+  background: rgba(255,255,255,0.20);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,255,255,0.30);
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 15px;
+  color: #4a154b;
+  width: 100%;
+  line-height: 1.5;
+}

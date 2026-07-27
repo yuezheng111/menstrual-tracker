@@ -1,0 +1,1 @@
+<view class="cycle-ring"><view class="ring-bg"></view><view class="ring-fg" style="stroke-dashoffset:{{offset}}"><slot /></view><view class="ring-center">{{text}}</view></view>

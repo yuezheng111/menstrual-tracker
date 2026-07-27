@@ -1,0 +1,1 @@
+<view class="stat-item"><view class="stat-value">{{value}}</view><view class="stat-label">{{label}}</view></view>

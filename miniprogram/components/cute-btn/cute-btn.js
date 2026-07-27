@@ -1,0 +1,1 @@
+Component({ properties: { text: { type: String, value: "\u6309\u94ae" }, type: { type: String, value: "normal" }, block: { type: Boolean, value: false }, loading: { type: Boolean, value: false }, loadingText: { type: String, value: "\u52a0\u8f7d\u4e2d..." } }, methods: { onTap() { if (!this.properties.loading) this.triggerEvent("tap") } } })

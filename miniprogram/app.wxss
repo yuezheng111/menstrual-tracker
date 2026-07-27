@@ -1,0 +1,10 @@
+@import "/styles/theme.wxss";
+
+page {
+  background: linear-gradient(-45deg, #fdf2f8, #fce4ec, #f3e5f5, #f8bbd0, #fce4ec, #fff3e0);
+  background-size: 400% 400%;
+  animation: bgFlow 18s ease infinite;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, PingFang SC, Microsoft YaHei, sans-serif;
+}
+::-webkit-scrollbar { display: none; }

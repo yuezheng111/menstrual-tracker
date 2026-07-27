@@ -1,0 +1,75 @@
+<view class="page-index" style="padding-top:{{statusBarHeight+10}}px">
+  <!-- Header -->
+  <view class="header animate-fade-up">
+    <view>
+      <text class="greeting">{{greeting}} 👋</text>
+      <text class="username">{{username}}</text>
+    </view>
+    <view class="avatar">🌸</view>
+  </view>
+
+  <!-- Empty state -->
+  <view wx:if="{{!hasData}}" class="empty-state glass animate-fade-up">
+    <view class="empty-emoji">📝</view>
+    <view class="empty-text">还没有记录</view>
+    <view class="empty-desc">开始记录经期，获得智能预测</view>
+    <view style="margin-top:20px">
+      <cute-btn text="开始记录" block="{{true}}" bindtap="goToRecord" />
+    </view>
+  </view>
+
+  <!-- Main content -->
+  <view wx:else>
+    <!-- Cycle Status Card -->
+    <glass-card customClass="cycle-card animate-fade-up">
+      <view class="cycle-inner">
+        <view class="cycle-emoji">{{statusEmoji}}</view>
+        <view class="cycle-status-text">{{statusText}}</view>
+        <view class="cycle-day" wx:if="{{cycleDay}}">周期第 <text class="day-num">{{cycleDay}}</text> 天</view>
+      </view>
+      <view class="cycle-countdown" wx:if="{{nextPeriodDays !== null}}">
+        距离下次经期还有 <text class="countdown-num">{{nextPeriodDays}}</text> 天
+      </view>
+      <view class="cycle-progress">
+        <view class="progress-bar" style="width:{{cycleProgress}}%"></view>
+      </view>
+    </glass-card>
+
+    <!-- Stats Row -->
+    <view class="stats-row animate-fade-up">
+      <stat-item value="{{totalRecords}}" label="总记录" />
+      <stat-item value="{{avgCycle}}" label="平均周期" />
+      <stat-item value="{{avgPeriod}}" label="平均经期" />
+    </view>
+
+    <!-- Prediction Card -->
+    <view wx:if="{{prediction.nextPeriodStart}}" class="prediction-card glass animate-fade-up">
+      <view class="card-title">📅 周期预测</view>
+      <view class="pred-row">
+        <text class="pred-label">下次经期</text>
+        <text class="pred-value">{{prediction.nextPeriodStart}} ~ {{prediction.nextPeriodEnd}}</text>
+      </view>
+      <view class="pred-row">
+        <text class="pred-label">排卵窗口</text>
+        <text class="pred-value">{{prediction.ovulationStart}} ~ {{prediction.ovulationEnd}}</text>
+      </view>
+      <view class="pred-row">
+        <text class="pred-label">易孕期</text>
+        <text class="pred-value">{{prediction.fertileWindowStart}} ~ {{prediction.fertileWindowEnd}}</text>
+      </view>
+      <view class="pred-row">
+        <text class="pred-label">安全期</text>
+        <text class="pred-value">{{prediction.safePeriodStart}} ~ {{prediction.safePeriodEnd}}</text>
+      </view>
+    </view>
+
+    <!-- Quick Actions -->
+    <view class="quick-actions animate-fade-up" style="display:flex;gap:12px;justify-content:center">
+      <cute-btn text="📝 记录经期" type="small" bindtap="goToRecord" />
+      <cute-btn text="📋 历史记录" type="small" bindtap="goToRecords" />
+    </view>
+  </view>
+
+  <!-- Bottom safe area -->
+  <view style="height:20px"></view>
+</view>

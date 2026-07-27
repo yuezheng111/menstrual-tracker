@@ -1,0 +1,155 @@
+.page-index {
+  padding: 20px 16px 0;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.greeting {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #4a154b;
+}
+.username {
+  display: block;
+  font-size: 14px;
+  color: #8e5580;
+  margin-top: 4px;
+}
+.avatar {
+  font-size: 42px;
+  animation: heartBeat 2s ease-in-out infinite;
+}
+
+/* Cycle Card */
+.cycle-card {
+  padding: 28px 20px !important;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.cycle-emoji {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+.cycle-status-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4a154b;
+}
+.cycle-day {
+  font-size: 14px;
+  color: #8e5580;
+  margin-top: 6px;
+}
+.day-num {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ec407a;
+}
+.cycle-countdown {
+  font-size: 13px;
+  color: #8e5580;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.25);
+}
+.countdown-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ec407a;
+}
+.cycle-progress {
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #f06292, #ce93d8);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Stats */
+.stats-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stats-row > stat-item {
+  flex: 1;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(25px);
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.30);
+}
+
+/* Prediction Card */
+.prediction-card {
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a154b;
+  margin-bottom: 14px;
+}
+.pred-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.pred-row:last-child { border-bottom: none; }
+.pred-label {
+  font-size: 14px;
+  color: #8e5580;
+}
+.pred-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a154b;
+}
+
+/* Quick Actions */
+.quick-actions {
+  margin-top: 4px;
+}
+
+/* Empty state */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+  margin-top: 40px;
+}
+.empty-emoji {
+  font-size: 56px;
+  margin-bottom: 12px;
+}
+.empty-text {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4a154b;
+}
+.empty-desc {
+  font-size: 14px;
+  color: #8e5580;
+  margin-top: 6px;
+}
+
+/* Animation */
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+  60% { transform: scale(1); }
+}

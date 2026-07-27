@@ -1,0 +1,56 @@
+<view class="page-profile">
+  <!-- Profile Header -->
+  <glass-card customClass="profile-header">
+    <view class="profile-avatar">🌸</view>
+    <text class="profile-name">{{userInfo.username || "用户"}}</text>
+    <text class="profile-email">{{userInfo.email || "未设置邮箱"}}</text>
+  </glass-card>
+
+  <!-- Settings -->
+  <glass-card customClass="settings-card">
+    <view class="section-title">⚙️ 个人设置</view>
+
+    <view class="form-group">
+      <text class="form-label">手机号</text>
+      <input class="input-glass" placeholder="手机号" value="{{userInfo.phone}}" bindinput="onInput" data-field="phone" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">邮箱</text>
+      <input class="input-glass" placeholder="邮箱" value="{{userInfo.email}}" bindinput="onInput" data-field="email" />
+    </view>
+
+    <view class="form-group">
+      <text class="form-label">出生日期</text>
+      <picker mode="date" value="{{userInfo.birthDate}}" bindchange="onBirthDateChange">
+        <view class="input-glass picker-trigger">{{userInfo.birthDate || "选择日期"}}</view>
+      </picker>
+    </view>
+
+    <view class="form-row">
+      <view class="form-group" style="flex:1">
+        <text class="form-label">初潮年龄</text>
+        <input class="input-glass" type="number" placeholder="年龄" value="{{userInfo.menarcheAge}}" bindinput="onInput" data-field="menarcheAge" />
+      </view>
+      <view class="form-group" style="flex:1">
+        <text class="form-label">周期(天)</text>
+        <input class="input-glass" type="number" placeholder="28" value="{{userInfo.avgCycleDays}}" bindinput="onInput" data-field="avgCycleDays" />
+      </view>
+      <view class="form-group" style="flex:1">
+        <text class="form-label">经期(天)</text>
+        <input class="input-glass" type="number" placeholder="5" value="{{userInfo.avgPeriodDays}}" bindinput="onInput" data-field="avgPeriodDays" />
+      </view>
+    </view>
+
+    <view style="margin-top:16px">
+      <cute-btn text="保存设置" block="{{true}}" loading="{{saving}}" bindtap="saveProfile" />
+    </view>
+  </glass-card>
+
+  <!-- Logout -->
+  <view class="logout-section" bindtap="logout">
+    <text>退出登录</text>
+  </view>
+
+  <view class="version">暖暖月经记录 v1.0.0</view>
+</view>

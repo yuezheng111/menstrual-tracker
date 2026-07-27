@@ -1,0 +1,90 @@
+/* ===== Theme Variables ===== */
+page {
+  --pink-100: #fce4ec;
+  --pink-200: #f8bbd0;
+  --pink-300: #f48fb1;
+  --pink-400: #f06292;
+  --pink-500: #ec407a;
+  --pink-600: #d81b60;
+  --purple-200: #e1bee7;
+  --purple-300: #ce93d8;
+  --purple-400: #ba68c8;
+  --glass-bg: rgba(255,255,255,0.15);
+  --glass-border: rgba(255,255,255,0.30);
+  --glass-shadow: 0 4px 16px rgba(236,64,122,0.08);
+  --text-primary: #4a154b;
+  --text-secondary: #8e5580;
+  --text-muted: #c89bb8;
+}
+
+/* ===== Animations ===== */
+@keyframes bgFlow {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes flowGrad {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+  60% { transform: scale(1); }
+}
+
+/* ===== Glass Card ===== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+.glass:active { transform: scale(0.97); }
+.glass-animate { animation: fadeUp 0.5s ease-out both; }
+
+/* ===== Flowing Button ===== */
+.btn-flow {
+  background: linear-gradient(135deg, #f06292, #ce93d8, #ec407a, #ba68c8, #f06292);
+  background-size: 300% 300%;
+  animation: flowGrad 4s ease infinite;
+  color: white; border: none; border-radius: 24px;
+  padding: 14px 32px; font-size: 16px; font-weight: 600;
+  text-align: center; box-shadow: 0 4px 16px rgba(236,64,122,0.30);
+  position: relative; overflow: hidden;
+}
+.btn-flow:active { transform: scale(0.96); }
+
+/* ===== Glass Input ===== */
+.input-glass {
+  background: rgba(255,255,255,0.20);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,255,255,0.30);
+  border-radius: 14px; padding: 14px 16px;
+  font-size: 15px; outline: none; color: var(--text-primary);
+  width: 100%; transition: all 0.3s;
+}
+.input-glass:focus {
+  border-color: var(--pink-400);
+  background: rgba(255,255,255,0.30);
+}
+.input-glass::placeholder { color: var(--text-muted); }
+
+/* ===== Safe Area ===== */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }

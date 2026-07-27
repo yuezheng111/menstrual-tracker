@@ -1,0 +1,52 @@
+<view class="page-records">
+  <view class="page-header">
+    <text class="page-title">📋 历史记录</text>
+    <text class="page-count" wx:if="{{total > 0}}">共 {{total}} 条</text>
+  </view>
+
+  <view wx:if="{{loading && records.length === 0}}" class="load-state">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{records.length === 0}}" class="empty-state glass">
+    <view class="empty-emoji">📝</view>
+    <view class="empty-text">还没有记录</view>
+    <view class="empty-desc">开始记录你的经期吧</view>
+    <view style="margin-top:20px">
+      <cute-btn text="去记录" block="{{true}}" bindtap="goToRecord" />
+    </view>
+  </view>
+
+  <scroll-view wx:else class="list-scroll" scroll-y>
+    <view wx:for="{{records}}" wx:key="id" class="record-card glass">
+      <view class="card-header">
+        <view class="card-dates">
+          <text class="card-date">{{item.startDate}}</text>
+          <text wx:if="{{item.endDate}}" class="card-date-sep">~ {{item.endDate}}</text>
+        </view>
+      </view>
+      <view class="card-badges">
+        <text class="badge badge-{{item.flow_lower}}">{{item.flowLabel}}</text>
+        <text class="badge badge-{{item.pain_lower}}">{{item.painLabel}}</text>
+        <text wx:if="{{item.clots !== undefined && item.clots !== null && item.clots !== ''}}" class="badge {{item.clots ? 'badge-heavy' : 'badge-none'}}">{{item.clots ? '有血块' : '无血块'}}</text>
+      </view>
+      <view wx:if="{{item.symptoms && item.symptoms.length > 0}}" class="card-tags">
+        <text wx:for="{{item.symptoms}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+      <view wx:if="{{item.moodTags && item.moodTags.length > 0}}" class="card-tags">
+        <text wx:for="{{item.moodTags}}" wx:key="*this" class="tag">{{item}}</text>
+      </view>
+      <view wx:if="{{item.notes}}" class="card-notes">{{item.notes}}</view>
+      <view class="card-btns">
+        <view class="card-btn btn-edit" bindtap="editRecord" data-id="{{item.id}}">
+          <text>✏️ 编辑</text>
+        </view>
+        <view class="card-btn btn-del" bindtap="confirmDelete" data-id="{{item.id}}">
+          <text>🗑️ 删除</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="fab" bindtap="goToRecord">+</view>
+</view>

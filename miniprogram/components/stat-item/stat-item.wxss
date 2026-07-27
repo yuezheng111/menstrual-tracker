@@ -1,0 +1,1 @@
+.stat-item { text-align: center; padding: 16px; } .stat-value { font-size: 24px; font-weight: 700; color: #ec407a; margin-bottom: 4px; } .stat-label { font-size: 12px; color: #8e5580; }

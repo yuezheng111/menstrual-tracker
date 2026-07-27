@@ -1,0 +1,26 @@
+import os
+content = []
+content.append('@charset "UTF-8";')
+content.append(':root {')
+content.append('    --pink-100: #fce4ec;')
+content.append('    --pink-200: #f8bbd0;')
+content.append('    --pink-300: #f48fb1;')
+content.append('    --pink-400: #f06292;')
+content.append('    --pink-500: #ec407a;')
+content.append('    --pink-600: #d81b60;')
+content.append('    --pink-700: #c2185b;')
+content.append('    --purple-200: #e1bee7;')
+content.append('    --purple-300: #ce93d8;')
+content.append('    --purple-400: #ba68c8;')
+content.append('    --glass-bg: rgba(255,255,255,0.18);')
+content.append('    --glass-border: rgba(255,255,255,0.35);')
+content.append('    --glass-shadow: 0 8px 32px rgba(236,64,122,0.10);')
+content.append('    --text-primary: #4a154b;')
+content.append('    --text-secondary: #8e5580;')
+content.append('    --text-muted: #c89bb8;')
+content.append('}')
+content.append('')
+path = r'D:\111网安学习\menstrual-tracker\frontend\src\assets\pink-theme.css'
+with open(path, 'w', encoding='utf-8') as f:
+    f.write('\n'.join(content))
+print('CSS part 1 written')
