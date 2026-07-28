@@ -14,3 +14,13 @@ __pycache__/
 *.pyo
 temp_gen.py
 generate_files.py
+
+# AI 助手临时文件
+fix_*.py
+write_css*.py
+generate_*.py
+temp_*.py
+*.log
+*.err
+.agents/
+.codex/
