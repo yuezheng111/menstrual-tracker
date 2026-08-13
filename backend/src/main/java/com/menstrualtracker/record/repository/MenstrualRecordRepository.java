@@ -23,4 +23,16 @@ public interface MenstrualRecordRepository extends JpaRepository<MenstrualRecord
     @Query("SELECT r FROM MenstrualRecord r WHERE r.userId = :userId AND r.deleted = false "
            + "AND r.startDate >= :start AND r.startDate <= :end ORDER BY r.startDate ASC")
     List<MenstrualRecord> findByUserIdAndDateRange(@Param("userId") Long userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
+
+    long countByUserId(Long userId);
+
+    long countByCreatedAtAfter(java.time.LocalDateTime time);
+
+    List<MenstrualRecord> findByCreatedAtAfter(java.time.LocalDateTime time);
+
+    @Query(value = "SELECT COUNT(DISTINCT user_id) FROM menstrual_records WHERE created_at >= :since AND deleted = 0", nativeQuery = true)
+    long countActiveUsersSince(@Param("since") java.time.LocalDateTime since);
+
+    @Query(value = "SELECT symptoms, COUNT(*) FROM menstrual_records WHERE symptoms IS NOT NULL AND symptoms != '' AND deleted = 0 GROUP BY symptoms ORDER BY COUNT(*) DESC LIMIT :limit", nativeQuery = true)
+    java.util.List<Object[]> findTopSymptoms(@Param("limit") int limit);
 }

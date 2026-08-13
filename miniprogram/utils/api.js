@@ -16,6 +16,7 @@ const request = (method, url, data) => {
           resolve(res.data.data)
         } else if (res.data.code === 401) {
           wx.removeStorageSync('token')
+          wx.removeStorageSync('role')
           wx.redirectTo({ url: '/pages/login/login' })
           reject(new Error(res.data.message))
         } else {

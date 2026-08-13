@@ -24,7 +24,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:ZXCvbnm123}
+      password: ${REDIS_PASSWORD}
       database: ${REDIS_DATABASE:0}
       timeout: 3000ms
       lettuce:
@@ -35,7 +35,7 @@ spring:
           max-wait: 3000ms
 
 jwt:
-  secret: ${JWT_SECRET:YTkzZjdhZjNiYzE4NGQ3ZjhhMzJmNzJkYzE4ZjU2YzE1ZjM4YTI5YzM2ZjViN2E4ZjI5YzM2ZjViN2E4ZjI5Yw==}
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 rate-limiter:
@@ -45,6 +45,15 @@ rate-limiter:
 wechat:
   app-id: test_app_id
   app-secret: test_app_secret
+
+admin:
+  bootstrap:
+    username: ${ADMIN_USERNAME:}
+    password: ${ADMIN_PASSWORD:}
+
+app:
+  security:
+    trusted-proxies: ${TRUSTED_PROXIES:127.0.0.1,::1}
 
 logging:
   pattern:

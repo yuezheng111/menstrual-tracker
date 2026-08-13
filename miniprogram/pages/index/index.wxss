@@ -19,7 +19,17 @@
   display: block;
   font-size: 14px;
   color: #8e5580;
+  margin-top: 0;
+}
+.username-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 4px;
+}
+.nickname-edit {
+  font-size: 14px;
+  color: #ec407a;
 }
 .avatar {
   font-size: 42px;
@@ -143,6 +153,16 @@
   font-size: 14px;
   color: #8e5580;
   margin-top: 6px;
+}
+
+/* Disclaimer */
+.disclaimer {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e5580;
+  opacity: 0.9;
+  padding: 14px 16px 10px;
 }
 
 /* Animation */

@@ -18,52 +18,16 @@
   font-weight: 700;
   color: #4a154b;
 }
-.profile-email {
-  display: block;
-  font-size: 13px;
-  color: #8e5580;
-  margin-top: 4px;
-}
-
-.settings-card {
-  padding: 20px !important;
-  margin-bottom: 12px;
-}
-.section-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #4a154b;
-  margin-bottom: 16px;
-}
-
-.form-group {
-  margin-bottom: 12px;
-}
-.form-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: #8e5580;
-  margin-bottom: 6px;
-}
-.form-row {
+.profile-name-row {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }
-
-.input-glass {
-  background: rgba(255,255,255,0.20);
-  backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255,255,255,0.30);
-  border-radius: 14px;
-  padding: 12px 14px;
-  font-size: 15px;
-  color: #4a154b;
-  width: 100%;
-}
-.picker-trigger {
-  color: #4a154b;
-  line-height: 1.4;
+.profile-name-edit {
+  font-size: 14px;
+  color: #ec407a;
 }
 
 .logout-section {
@@ -81,4 +45,28 @@
   font-size: 12px;
   color: #c89bb8;
   padding-bottom: 40px;
+}
+
+.admin-entry {
+  margin: 20rpx 24rpx;
+  padding: 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+.admin-entry-emoji { font-size: 44rpx; }
+.admin-entry-text { flex: 1; }
+.admin-entry-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.admin-entry-desc {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  margin-top: 4rpx;
+}
+.admin-entry-arrow {
+  font-size: 40rpx;
+  color: var(--text-muted);
 }

@@ -1,0 +1,17 @@
+<view class="admin-login-page">
+  <view class="login-card glass">
+    <view class="login-title">🔐 管理后台</view>
+    <view class="login-sub">经期助手 · 管理员入口</view>
+
+    <view class="form-group">
+      <text class="form-label">用户名</text>
+      <input class="input-glass" placeholder="请输入用户名" value="{{username}}" data-field="username" bindinput="onInput" />
+    </view>
+    <view class="form-group">
+      <text class="form-label">密码</text>
+      <input class="input-glass" password placeholder="请输入密码" value="{{password}}" data-field="password" bindinput="onInput" />
+    </view>
+
+    <button class="login-btn" loading="{{loading}}" bindtap="handleLogin">登 录</button>
+  </view>
+</view>

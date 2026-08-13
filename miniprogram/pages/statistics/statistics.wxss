@@ -44,4 +44,14 @@
 .symptom-bar { height: 100%; background: linear-gradient(90deg, #f06292, #ce93d8); border-radius: 4px; transition: width 0.6s ease; }
 .symptom-count { font-size: 12px; color: #8e5580; white-space: nowrap; }
 
+/* Disclaimer */
+.disclaimer {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e5580;
+  opacity: 0.9;
+  padding: 14px 16px 10px;
+}
+
 .no-data { text-align: center; padding: 20px; color: #c89bb8; font-size: 13px; }

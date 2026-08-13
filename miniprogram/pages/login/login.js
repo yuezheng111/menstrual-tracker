@@ -21,7 +21,8 @@ Page({
           try {
             const result = await api.post('/auth/wx-login', { code: res.code })
             wx.setStorageSync('token', result.token)
-            wx.setStorageSync('username', result.user.username)
+            wx.setStorageSync('nickname', result.user.nickname || result.user.username || '用户')
+            wx.setStorageSync('role', result.user.role || 'USER')
             getApp().globalData.token = result.token
             wx.showToast({ title: '登录成功', icon: 'success' })
             wx.reLaunch({ url: '/pages/index/index' })

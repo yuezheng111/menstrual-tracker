@@ -14,7 +14,7 @@
                     <el-form :model="registerForm" label-width="0">
                         <el-form-item><el-input v-model="registerForm.username" placeholder="用户名" prefix-icon="User" /></el-form-item>
                         <el-form-item><el-input v-model="registerForm.password" type="password" placeholder="密码" prefix-icon="Lock" show-password /></el-form-item>
-                        <el-form-item><el-input v-model="registerForm.email" placeholder="邮箱（选填）" prefix-icon="Message" /></el-form-item>
+
                         <el-form-item><el-button type="primary" :loading="loading" style="width: 100%" @click="handleRegister">注册</el-button></el-form-item>
                     </el-form>
                 </el-tab-pane>
@@ -33,7 +33,7 @@ const router = useRouter()
 const activeTab = ref('login')
 const loading = ref(false)
 const loginForm = reactive({ username: '', password: '' })
-const registerForm = reactive({ username: '', password: '', email: '' })
+const registerForm = reactive({ username: '', password: '' })
 
 const handleLogin = async () => {
     loading.value = true

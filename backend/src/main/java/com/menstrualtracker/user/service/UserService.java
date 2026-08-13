@@ -54,14 +54,13 @@ public class UserService {
     public ApiResponse<LoginResponse> register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername()))
             throw BusinessException.conflict("Username already exists");
-        if (request.getEmail() != null && userRepository.existsByEmail(request.getEmail()))
-            throw BusinessException.conflict("Email already exists");
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .phone(request.getPhone()).email(request.getEmail()).build();
+                .loginType("PASSWORD")
+                .build();
         user = userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         // 閻忓繐妫旂槐鎵嫚濠靛洦衼閻忓繐瀚悺銊╁礂?Redis闁?濠㈠灈鏅炵换鍐嫉閻曞倻绀?
         cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(), TOKEN_CACHE_TTL, TimeUnit.DAYS);
         return ApiResponse.success("Registration successful", buildLoginResponse(user, token));
@@ -69,17 +68,23 @@ public class UserService {
 
     public ApiResponse<LoginResponse> login(LoginRequest request, String clientIp) {
         // 閺堫剙婀撮梽鎰ウ閿涘牅绗夋笟婵婄 Redis閿?
-        if (!loginRateLimiter.isAllowed(clientIp)) {
+        String username = request.getUsername();
+        if (loginRateLimiter.isBlocked(clientIp, username)) {
             throw BusinessException.tooManyRequests("Too many login attempts, please try again later");
         }
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> BusinessException.unauthorized("Invalid username or password"));
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            loginRateLimiter.onFailure(clientIp, username);
             throw BusinessException.unauthorized("Invalid username or password");
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        }
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+            loginRateLimiter.onFailure(clientIp, username);
+            throw BusinessException.forbidden("Account has been disabled");
+        }
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         // 閻忓繐妫旂槐鎵嫚濠靛洦衼閻忓繐瀚悺銊╁礂?Redis闁?濠㈠灈鏅炵换鍐嫉閻曞倻绀?
         cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(), TOKEN_CACHE_TTL, TimeUnit.DAYS);
-        loginRateLimiter.onSuccess(clientIp);
+        loginRateLimiter.onSuccess(clientIp, username);
         return ApiResponse.success("Login successful", buildLoginResponse(user, token));
     }
 
@@ -99,18 +104,17 @@ public class UserService {
 
     public ApiResponse<LoginResponse> wxLogin(String code, String clientIp) {
         // 閺堫剙婀撮梽鎰ウ閿涘牅绗夋笟婵婄 Redis閿?
-        if (!loginRateLimiter.isAllowed(clientIp)) {
+        if (loginRateLimiter.isBlocked(clientIp, "wx-login")) {
             throw BusinessException.tooManyRequests("Too many login attempts, please try again later");
         }
         String openId;
-        String mockUsername = "wx_user";
 
         if (wechatAppId.startsWith("test_")) {
-            openId = mockOpenId(code);
-            mockUsername = "test_user_" + openId.substring(0, 8);
+            openId = "mock_fixed_user";
         } else {
             openId = callWeChatApi(code);
             if (openId == null) {
+                loginRateLimiter.onFailure(clientIp, "wx-login");
                 throw BusinessException.badRequest("WeChat login failed");
             }
         }
@@ -119,17 +123,24 @@ public class UserService {
 
         if (user == null) {
             user = User.builder()
-                    .username(mockUsername)
+                    .username(generateWxUsername(openId))
+                    .nickname("微信用户")
                     .openId(openId)
                     .password(passwordEncoder.encode(openId))
+                    .loginType("WECHAT")
                     .build();
             user = userRepository.save(user);
         }
 
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        if (user != null && !Boolean.TRUE.equals(user.getEnabled())) {
+            loginRateLimiter.onFailure(clientIp, "wx-login");
+            throw BusinessException.forbidden("Account has been disabled");
+        }
+
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         // 閻忓繐妫旂槐鎵嫚濠靛洦衼閻忓繐瀚悺銊╁礂?Redis闁?濠㈠灈鏅炵换鍐嫉閻曞倻绀?
         cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(), TOKEN_CACHE_TTL, TimeUnit.DAYS);
-        loginRateLimiter.onSuccess(clientIp);
+        loginRateLimiter.onSuccess(clientIp, "wx-login");
         return ApiResponse.success("Login successful", buildLoginResponse(user, token));
     }
 
@@ -143,32 +154,39 @@ public class UserService {
     public ApiResponse<UserProfileDTO> updateProfile(Long userId, UserProfileDTO request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> BusinessException.notFound("User not found"));
-        if (request.getPhone() != null) user.setPhone(request.getPhone());
-        if (request.getEmail() != null) {
-            if (!request.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(request.getEmail()))
-                throw BusinessException.conflict("Email already exists");
-            user.setEmail(request.getEmail());
-        }
         if (request.getAvatar() != null) user.setAvatar(request.getAvatar());
-        if (request.getBirthDate() != null) user.setBirthDate(request.getBirthDate());
-        if (request.getMenarcheAge() != null) user.setMenarcheAge(request.getMenarcheAge());
-        if (request.getAvgCycleDays() != null) user.setAvgCycleDays(request.getAvgCycleDays());
-        if (request.getAvgPeriodDays() != null) user.setAvgPeriodDays(request.getAvgPeriodDays());
+        if (request.getNickname() != null) {
+            String nickname = request.getNickname().trim();
+            if (nickname.isEmpty()) {
+                throw BusinessException.badRequest("Nickname cannot be empty");
+            }
+            if (nickname.length() > 30) {
+                throw BusinessException.badRequest("Nickname must be 1-30 characters");
+            }
+            if (nickname.matches(".*[\\x00-\\x1F\\x7F].*") || nickname.contains("<") || nickname.contains(">")) {
+                throw BusinessException.badRequest("Nickname contains invalid characters");
+            }
+            user.setNickname(nickname);
+        }
         user = userRepository.save(user);
         return ApiResponse.success("Profile updated", toProfileDTO(user));
     }
 
-    private String mockOpenId(String code) {
+    private String generateWxUsername(String openId) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest((wechatAppId + ":" + code).getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex = new StringBuilder();
-            for (byte b : hash) hex.append(String.format("%02x", b));
-            return "mock_" + hex.substring(0, 24);
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(openId.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder("wx_");
+            for (int i = 0; i < 6; i++) {
+                sb.append(String.format("%02x", hash[i]));
+            }
+            return sb.toString();
         } catch (Exception e) {
-            return "mock_" + System.currentTimeMillis();
+            log.warn("Failed to hash openId, falling back to openId hash code", e);
+            return "wx_" + Integer.toHexString(openId.hashCode());
         }
     }
+
 
     private String callWeChatApi(String code) {
         try {
@@ -254,9 +272,9 @@ public class UserService {
 
     private UserProfileDTO toProfileDTO(User user) {
         return UserProfileDTO.builder()
-                .id(user.getId()).username(user.getUsername()).phone(user.getPhone())
-                .email(user.getEmail()).avatar(user.getAvatar()).birthDate(user.getBirthDate())
-                .menarcheAge(user.getMenarcheAge()).avgCycleDays(user.getAvgCycleDays())
-                .avgPeriodDays(user.getAvgPeriodDays()).build();
+                .id(user.getId()).username(user.getUsername())
+                .nickname(user.getNickname())
+                .avatar(user.getAvatar())
+                .role(user.getRole()).build();
     }
 }

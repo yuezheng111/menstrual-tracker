@@ -7,11 +7,11 @@
     <glass-card customClass="form-section">
       <view class="section-title">📅 日期</view>
       <view class="date-row">
-        <picker mode="date" value="{{form.startDate}}" bindchange="onStartDateChange">
+        <picker mode="date" value="{{form.startDate}}" end="{{form.endDate}}" bindchange="onStartDateChange">
           <view class="date-box"><text class="date-lbl">开始</text><text class="date-val {{form.startDate ? '' : 'empty'}}">{{form.startDate || '选择'}}</text></view>
         </picker>
         <text class="date-sep">~</text>
-        <picker mode="date" value="{{form.endDate}}" bindchange="onEndDateChange">
+        <picker mode="date" value="{{form.endDate}}" start="{{form.startDate}}" bindchange="onEndDateChange">
           <view class="date-box"><text class="date-lbl">结束</text><text class="date-val {{form.endDate ? '' : 'empty'}}">{{form.endDate || '选择'}}</text></view>
         </picker>
       </view>

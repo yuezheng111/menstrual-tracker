@@ -3,9 +3,13 @@
   <view class="header animate-fade-up">
     <view>
       <text class="greeting">{{greeting}} 👋</text>
-      <text class="username">{{username}}</text>
+      <view class="username-row" bindtap="editNickname">
+        <text class="username">{{nickname}}</text>
+        <text class="nickname-edit">✏️</text>
+      </view>
     </view>
-    <view class="avatar">🌸</view>
+    <view wx:if="{{isAdmin}}" class="avatar" bindtap="goToProfile">🌸</view>
+    <view wx:else class="avatar">🌸</view>
   </view>
 
   <!-- Empty state -->
@@ -15,6 +19,9 @@
     <view class="empty-desc">开始记录经期，获得智能预测</view>
     <view style="margin-top:20px">
       <cute-btn text="开始记录" block="{{true}}" bindtap="goToRecord" />
+    </view>
+    <view wx:if="{{isAdmin}}" style="margin-top:12px">
+      <cute-btn text="👤 我的" type="small" bindtap="goToProfile" />
     </view>
   </view>
 
@@ -67,8 +74,12 @@
     <view class="quick-actions animate-fade-up" style="display:flex;gap:12px;justify-content:center">
       <cute-btn text="📝 记录经期" type="small" bindtap="goToRecord" />
       <cute-btn text="📋 历史记录" type="small" bindtap="goToRecords" />
+      <cute-btn wx:if="{{isAdmin}}" text="👤 我的" type="small" bindtap="goToProfile" />
     </view>
   </view>
+
+  <!-- Disclaimer -->
+  <view class="disclaimer">⚠️ 预测日期仅供参考，请以实际身体感受为准</view>
 
   <!-- Bottom safe area -->
   <view style="height:20px"></view>

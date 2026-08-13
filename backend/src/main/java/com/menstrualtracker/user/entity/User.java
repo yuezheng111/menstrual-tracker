@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,12 +25,6 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(length = 20)
-    private String phone;
-
-    @Column(length = 100, unique = true)
-    private String email;
-
     @Column(name = "open_id", length = 64, unique = true)
     private String openId;
 
@@ -41,17 +34,24 @@ public class User {
     @Column(length = 500)
     private String avatar;
 
-    private LocalDate birthDate;
+    @Column(length = 50)
+    private String nickname;
 
-    private Integer menarcheAge;
-
-    @Column(name = "avg_cycle_days")
+    @Column(nullable = false, length = 20)
     @Builder.Default
-    private Integer avgCycleDays = 28;
+    private String role = "USER";
 
-    @Column(name = "avg_period_days")
+    @Column(name = "login_type", nullable = false, length = 20)
     @Builder.Default
-    private Integer avgPeriodDays = 5;
+    private String loginType = "PASSWORD";
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean enabled = true;
+
+    @Column(name = "password_change_required", nullable = false)
+    @Builder.Default
+    private Boolean passwordChangeRequired = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

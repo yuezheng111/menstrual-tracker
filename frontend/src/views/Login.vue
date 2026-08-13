@@ -28,7 +28,6 @@
                 <div v-else>
                     <input v-model="registerForm.username" class="cute-input" placeholder="用户名" />
                     <input v-model="registerForm.password" type="password" class="cute-input" placeholder="密码" />
-                    <input v-model="registerForm.email" class="cute-input" placeholder="邮箱（选填）" />
                     <button class="btn-pink btn-full" :disabled="loading" @click="handleRegister">
                         {{ loading ? '注册中...' : '注册' }}
                     </button>
@@ -47,7 +46,7 @@ const router = useRouter()
 const activeTab = ref('login')
 const loading = ref(false)
 const loginForm = reactive({ username: '', password: '' })
-const registerForm = reactive({ username: '', password: '', email: '' })
+const registerForm = reactive({ username: '', password: '' })
 
 const hearts = Array.from({ length: 8 }, (_, i) => ({
     id: i, x: Math.random() * 100,

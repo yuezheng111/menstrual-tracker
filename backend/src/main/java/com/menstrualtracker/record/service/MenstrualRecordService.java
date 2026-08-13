@@ -32,6 +32,7 @@ public class MenstrualRecordService {
     private static final String RECORDS_CACHE_KEY = "menstrual:user:%d:records:page:%d:size:%d:year:%s:month:%s";
     private static final String RECORDS_CACHE_PATTERN = "menstrual:user:%d:records:*";
     private static final String PREDICT_CACHE_PATTERN = "menstrual:user:%d:predict";
+    private static final String OVERVIEW_CACHE_PATTERN = "menstrual:user:%d:overview";
     private static final long RECORDS_CACHE_TTL = 10; // 分钟
 
     /**
@@ -89,6 +90,9 @@ public class MenstrualRecordService {
 
     @Transactional
     public ApiResponse<RecordDTO> createRecord(Long userId, RecordCreateRequest request) {
+        if (request.getEndDate() != null && request.getEndDate().isBefore(request.getStartDate())) {
+            throw BusinessException.badRequest("End date cannot be before start date");
+        }
         User user = userRepository.findById(userId).orElseThrow(() -> BusinessException.notFound("User not found"));
         java.util.List<MenstrualRecord> allRecords = recordRepository.findByUserIdAndDeletedFalseOrderByStartDateDesc(userId);
         LocalDate prevStart = allRecords.stream()
@@ -124,6 +128,9 @@ public class MenstrualRecordService {
         if (request.getSymptoms() != null) record.setSymptoms(toJson(request.getSymptoms()));
         if (request.getMoodTags() != null) record.setMoodTags(toJson(request.getMoodTags()));
         if (request.getNotes() != null) record.setNotes(request.getNotes());
+        if (record.getEndDate() != null && record.getEndDate().isBefore(record.getStartDate())) {
+            throw BusinessException.badRequest("End date cannot be before start date");
+        }
         record = recordRepository.save(record);
 
         // 写操作后删除该用户的预测缓存和列表缓存
@@ -155,6 +162,7 @@ public class MenstrualRecordService {
     private void invalidateUserCaches(Long userId) {
         cacheService.deleteByPattern(String.format(RECORDS_CACHE_PATTERN, userId));
         cacheService.deleteByPattern(String.format(PREDICT_CACHE_PATTERN, userId));
+        cacheService.deleteByPattern(String.format(OVERVIEW_CACHE_PATTERN, userId));
     }
 
     private RecordDTO toDTO(MenstrualRecord record) {

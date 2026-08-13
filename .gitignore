@@ -24,3 +24,22 @@ temp_*.py
 *.err
 .agents/
 .codex/
+
+
+# WeChat DevTools private config (contains local debug info, do not commit)
+project.private.config.json
+
+# Local environment files
+.env
+*.env
+
+# Local-only Spring config
+application-local.yml
+
+
+# Config files containing plaintext credentials (do not commit)
+backend/src/main/resources/application.yml
+backend/src/main/resources/application-dev.yml
+backend/src/main/resources/application-prod.yml
+docker-compose.yml
+backend/src/main/java/com/menstrualtracker/common/config/DataInitializer.java

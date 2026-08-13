@@ -1,0 +1,18 @@
+<view class="admin-page">
+  <view class="filter-bar">
+    <view class="filter-chip {{typeFilter === '' ? 'chip-active' : ''}}" data-type="" bindtap="onTypeChange">全部</view>
+    <view class="filter-chip {{typeFilter === 'SYMPTOM' ? 'chip-active' : ''}}" data-type="SYMPTOM" bindtap="onTypeChange">症状</view>
+    <view class="filter-chip {{typeFilter === 'MOOD' ? 'chip-active' : ''}}" data-type="MOOD" bindtap="onTypeChange">情绪</view>
+  </view>
+
+  <view wx:for="{{list}}" wx:key="id" class="tag-item glass">
+    <view class="tag-color" style="background:{{item.color || '#409EFF'}}"></view>
+    <view class="tag-info">
+      <view class="tag-name">{{item.name}} <text class="tag-type">{{item.type}}</text></view>
+      <view class="tag-meta">用户 #{{item.userId}} · 排序 {{item.sortOrder}}</view>
+    </view>
+    <view class="tag-del" data-row="{{item}}" bindtap="handleDelete">删除</view>
+  </view>
+  <view wx:if="{{!loading && list.length === 0}}" class="empty-text">暂无标签</view>
+  <view wx:if="{{loading}}" class="empty-text">加载中...</view>
+</view>

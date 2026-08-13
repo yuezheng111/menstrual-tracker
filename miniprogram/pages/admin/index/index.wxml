@@ -1,0 +1,66 @@
+<view class="admin-page">
+  <view class="admin-header">
+    <view>
+      <text class="admin-title">📊 数据看板</text>
+      <text class="admin-sub">管理员：{{adminName}}</text>
+    </view>
+    <view class="logout-btn" bindtap="logout">退出</view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stat-grid">
+    <view class="stat-card glass">
+      <view class="stat-num">{{stats.totalUsers}}</view>
+      <view class="stat-label">总用户数</view>
+    </view>
+    <view class="stat-card glass">
+      <view class="stat-num">{{stats.newUsersThisMonth}}</view>
+      <view class="stat-label">本月新增</view>
+    </view>
+    <view class="stat-card glass">
+      <view class="stat-num">{{stats.totalRecords}}</view>
+      <view class="stat-label">总记录数</view>
+    </view>
+    <view class="stat-card glass">
+      <view class="stat-num">{{stats.todayRecords}}</view>
+      <view class="stat-label">今日记录</view>
+    </view>
+    <view class="stat-card glass">
+      <view class="stat-num">{{stats.activeUsers7d}}</view>
+      <view class="stat-label">7日活跃用户</view>
+    </view>
+  </view>
+
+  <!-- 症状 TOP -->
+  <view class="section-card glass">
+    <view class="section-title">🩺 症状统计 TOP10</view>
+    <view wx:if="{{topSymptoms.length === 0}}" class="empty-text">暂无症状数据</view>
+    <view wx:for="{{topSymptoms}}" wx:key="name" class="symptom-row">
+      <text class="symptom-name">{{item.name}}</text>
+      <view class="symptom-bar-wrap">
+        <view class="symptom-bar" style="width:{{maxSymptomCount ? (item.count / maxSymptomCount * 100) : 0}}%"></view>
+      </view>
+      <text class="symptom-count">{{item.count}}</text>
+    </view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="menu-grid">
+    <view class="menu-item glass" data-url="/pages/admin/users/users" bindtap="goTo">
+      <view class="menu-emoji">👥</view>
+      <text>用户管理</text>
+    </view>
+    <view class="menu-item glass" data-url="/pages/admin/tags/tags" bindtap="goTo">
+      <view class="menu-emoji">🏷️</view>
+      <text>标签管理</text>
+    </view>
+    <view class="menu-item glass" data-url="/pages/admin/admins/admins" bindtap="goTo">
+      <view class="menu-emoji">🔐</view>
+      <text>管理员管理</text>
+    </view>
+    <view class="menu-item glass" data-url="/pages/admin/exports/exports" bindtap="goTo">
+      <view class="menu-emoji">📤</view>
+      <text>数据导出</text>
+    </view>
+  </view>
+</view>

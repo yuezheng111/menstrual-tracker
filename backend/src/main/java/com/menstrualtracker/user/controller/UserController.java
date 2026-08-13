@@ -1,6 +1,9 @@
 package com.menstrualtracker.user.controller;
 
 import com.menstrualtracker.common.dto.ApiResponse;
+import com.menstrualtracker.common.cache.RegisterRateLimiter;
+import com.menstrualtracker.common.exception.BusinessException;
+import com.menstrualtracker.common.util.ClientIpResolver;
 import com.menstrualtracker.user.dto.*;
 import com.menstrualtracker.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,30 +21,33 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final RegisterRateLimiter registerRateLimiter;
+    private final ClientIpResolver clientIpResolver;
 
     @PostMapping("/register")
     @Operation(summary = "Register")
-    public ApiResponse<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ApiResponse<LoginResponse> register(@Valid @RequestBody RegisterRequest request,
+                                               HttpServletRequest servletRequest) {
+        String clientIp = clientIpResolver.resolve(servletRequest);
+        if (!registerRateLimiter.isAllowed(clientIp)) {
+            throw BusinessException.tooManyRequests("Too many registration attempts, please try again later");
+        }
         return userService.register(request);
     }
 
     @PostMapping("/login")
     @Operation(summary = "Login")
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request,
-                                            @RequestHeader(value = "X-Forwarded-For", required = false) String xForwardedFor,
-                                            @RequestHeader(value = "X-Real-IP", required = false) String xRealIp,
                                             HttpServletRequest servletRequest) {
-        String clientIp = resolveClientIp(xForwardedFor, xRealIp, servletRequest);
+        String clientIp = clientIpResolver.resolve(servletRequest);
         return userService.login(request, clientIp);
     }
 
     @PostMapping("/wx-login")
     @Operation(summary = "WeChat mini program login")
     public ApiResponse<LoginResponse> wxLogin(@Valid @RequestBody WxLoginRequest request,
-                                              @RequestHeader(value = "X-Forwarded-For", required = false) String xForwardedFor,
-                                              @RequestHeader(value = "X-Real-IP", required = false) String xRealIp,
                                               HttpServletRequest servletRequest) {
-        String clientIp = resolveClientIp(xForwardedFor, xRealIp, servletRequest);
+        String clientIp = clientIpResolver.resolve(servletRequest);
         return userService.wxLogin(request.getCode(), clientIp);
     }
 
@@ -69,15 +74,4 @@ public class UserController {
         return userService.logout(token);
     }
 
-    private String resolveClientIp(String xForwardedFor, String xRealIp, HttpServletRequest request) {
-        String ip = xForwardedFor;
-        if (StringUtils.hasText(ip) && !"unknown".equalsIgnoreCase(ip)) {
-            return ip.split(",")[0].trim();
-        }
-        ip = xRealIp;
-        if (StringUtils.hasText(ip) && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-        return request.getRemoteAddr();
-    }
 }

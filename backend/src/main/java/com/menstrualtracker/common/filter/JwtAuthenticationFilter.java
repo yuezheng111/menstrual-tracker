@@ -1,8 +1,12 @@
 package com.menstrualtracker.common.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.menstrualtracker.common.cache.CacheService;
 import com.menstrualtracker.common.cache.TokenBlacklistCache;
+import com.menstrualtracker.common.dto.ApiResponse;
 import com.menstrualtracker.common.util.JwtUtil;
+import com.menstrualtracker.user.entity.User;
+import com.menstrualtracker.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * JWT 认证过滤器 — 验证 Token 有效性，同时检查 Redis 中是否存在该 Token 对应的会话映射。
@@ -31,6 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CacheService cacheService;
     private final TokenBlacklistCache tokenBlacklistCache;
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     private static final String TOKEN_CACHE_KEY = "menstrual:token:%s";
 
@@ -62,8 +69,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             // sessionExists == null 表示 Redis 不可用 → 降级，本地黑名单已在步骤 1 兜底，信任 JWT
 
+            String role = jwtUtil.getRoleFromToken(token);
+            if ("ADMIN".equals(role) && !"/api/admin/password/change".equals(request.getRequestURI())) {
+                User user = userRepository.findById(userId).orElse(null);
+                if (user != null && Boolean.TRUE.equals(user.getPasswordChangeRequired())) {
+                    log.info("Admin must change password before using admin APIs: userId={}", userId);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(403);
+                    response.getWriter().write(objectMapper.writeValueAsString(
+                            ApiResponse.error(403, "Please change your password first")));
+                    return;
+                }
+            }
+            List<org.springframework.security.core.GrantedAuthority> authorities =
+                    "ADMIN".equals(role)
+                            ? List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_ADMIN"))
+                            : Collections.emptyList();
+
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(userId, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

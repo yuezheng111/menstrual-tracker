@@ -1,0 +1,44 @@
+<view class="admin-page">
+  <view class="search-bar">
+    <input class="input-glass search-input" placeholder="搜索用户名" value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="onSearch" />
+    <view class="search-btn" bindtap="onSearch">搜索</view>
+    <view wx:if="{{keyword}}" class="clear-btn" bindtap="onClearSearch">✕</view>
+  </view>
+
+  <view class="user-list">
+    <view wx:for="{{list}}" wx:key="id" class="user-item glass">
+      <view class="user-info">
+        <view class="user-name">
+          {{item.username}}
+          <text class="tag-role {{item.role === 'ADMIN' ? 'tag-admin' : ''}}">{{item.role}}</text>
+        </view>
+        <view class="user-meta">记录 {{item.recordCount}} 条 · 注册于 {{item.createdAt ? item.createdAt.substring(0, 10) : '-'}}</view>
+      </view>
+      <view class="user-actions">
+        <view class="mini-btn {{item.enabled ? 'btn-warn' : 'btn-ok'}}" data-row="{{item}}" bindtap="toggleStatus">{{item.enabled ? '禁用' : '启用'}}</view>
+        <view class="mini-btn btn-reset" data-row="{{item}}" bindtap="openReset">重置密码</view>
+      </view>
+    </view>
+    <view wx:if="{{!loading && list.length === 0}}" class="empty-text">暂无用户</view>
+    <view wx:if="{{loading}}" class="empty-text">加载中...</view>
+  </view>
+
+  <view class="pager">
+    <view class="pager-btn" bindtap="prevPage">上一页</view>
+    <text class="pager-info">{{page}} / {{totalPages || 1}}（共 {{total}} 人）</text>
+    <view class="pager-btn" bindtap="nextPage">下一页</view>
+  </view>
+
+  <!-- 重置密码弹窗 -->
+  <view wx:if="{{resetVisible}}" class="modal-mask" bindtap="closeReset">
+    <view class="modal-card glass" catchtap="">
+      <view class="modal-title">重置密码</view>
+      <view class="modal-sub">用户：{{resetTarget.username}}</view>
+      <input class="input-glass" password placeholder="新密码（至少 8 位）" value="{{newPassword}}" bindinput="onPasswordInput" />
+      <view class="modal-btns">
+        <view class="modal-btn" bindtap="closeReset">取消</view>
+        <view class="modal-btn modal-btn-primary" bindtap="confirmReset">确定</view>
+      </view>
+    </view>
+  </view>
+</view>

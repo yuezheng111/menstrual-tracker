@@ -2,7 +2,8 @@ const api = require('../../utils/api')
 
 Page({
   data: {
-    username: '',
+    nickname: '',
+    isAdmin: false,
     greeting: '你好',
     hasData: false,
     totalRecords: 0,
@@ -18,9 +19,59 @@ Page({
 
   onShow() {
     this.initStatusBar()
-    this.setData({ username: wx.getStorageSync('username') || '用户' })
+    this.setData({ nickname: wx.getStorageSync('nickname') || '用户' })
     this.setGreeting()
+    this.refreshRole()
     this.loadData()
+  },
+
+  async refreshRole() {
+    try {
+      const p = await api.get('/auth/profile')
+      const role = p.role || 'USER'
+      const nickname = p.nickname || p.username || '用户'
+      wx.setStorageSync('role', role)
+      wx.setStorageSync('nickname', nickname)
+      this.setData({ isAdmin: role === 'ADMIN', nickname })
+    } catch (e) {
+      const role = wx.getStorageSync('role') || 'USER'
+      this.setData({ isAdmin: role === 'ADMIN' })
+    }
+  },
+
+  editNickname() {
+    const current = this.data.nickname === '用户' ? '' : this.data.nickname
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      content: current,
+      placeholderText: '请输入昵称',
+      success: async (res) => {
+        if (!res.confirm) return
+        const name = (res.content || '').trim()
+        if (!name) {
+          wx.showToast({ title: '昵称不能为空', icon: 'none' })
+          return
+        }
+        if (name.length > 30) {
+          wx.showToast({ title: '昵称最多30个字符', icon: 'none' })
+          return
+        }
+        try {
+          const updated = await api.put('/auth/profile', { nickname: name })
+          const display = updated.nickname || name
+          wx.setStorageSync('nickname', display)
+          this.setData({ nickname: display })
+          wx.showToast({ title: '已更新', icon: 'success' })
+        } catch (e) {
+          wx.showToast({ title: '修改失败', icon: 'none' })
+        }
+      }
+    })
+  },
+
+  goToProfile() {
+    wx.navigateTo({ url: '/pages/profile/profile' })
   },
 
   initStatusBar() {

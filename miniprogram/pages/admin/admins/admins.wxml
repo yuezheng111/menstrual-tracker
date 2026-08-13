@@ -1,0 +1,31 @@
+<view class="admin-page">
+  <view class="toolbar">
+    <view class="grant-btn" bindtap="openGrant">＋ 授予管理员</view>
+  </view>
+
+  <view wx:for="{{list}}" wx:key="id" class="admin-item glass">
+    <view class="admin-info">
+      <view class="admin-name">
+        {{item.username}}
+        <text wx:if="{{item.username === currentAdmin}}" class="me-tag">我</text>
+      </view>
+      <view class="admin-meta">{{item.enabled ? '正常' : '已禁用'}}</view>
+    </view>
+    <view class="admin-del" wx:if="{{item.username !== currentAdmin}}" data-row="{{item}}" bindtap="handleRevoke">撤销</view>
+    <view wx:else class="admin-del disabled">当前账号</view>
+  </view>
+  <view wx:if="{{!loading && list.length === 0}}" class="empty-text">暂无管理员</view>
+
+  <!-- 授予弹窗 -->
+  <view wx:if="{{grantVisible}}" class="modal-mask" bindtap="closeGrant">
+    <view class="modal-card glass" catchtap="">
+      <view class="modal-title">授予管理员</view>
+      <view class="modal-sub">输入要提升为管理员的用户名</view>
+      <input class="input-glass" placeholder="用户名" value="{{grantUsername}}" bindinput="onGrantInput" />
+      <view class="modal-btns">
+        <view class="modal-btn" bindtap="closeGrant">取消</view>
+        <view class="modal-btn modal-btn-primary" bindtap="confirmGrant">{{granting ? '处理中...' : '确定'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

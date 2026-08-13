@@ -60,9 +60,20 @@ Page({
     try {
       await api.del('/records/' + id)
       wx.showToast({ title: '已删除', icon: 'success' })
+      this.refreshHome()
       this.loadRecords()
     } catch (e) {
       wx.showToast({ title: '删除失败', icon: 'none' })
+    }
+  },
+
+
+  refreshHome() {
+    const pages = getCurrentPages()
+    for (const pg of pages) {
+      if (pg.route === 'pages/index/index' && typeof pg.loadData === 'function') {
+        pg.loadData()
+      }
     }
   },
 

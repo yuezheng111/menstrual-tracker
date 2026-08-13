@@ -1,0 +1,19 @@
+<view class="admin-page">
+  <view class="notice glass">
+    <view class="notice-title">📤 数据导出说明</view>
+    <view class="notice-text">· 导出的文件为 CSV 格式（UTF-8 编码），可用 Excel / WPS 打开。</view>
+    <view class="notice-text">· 小程序端导出文件保存到小程序本地；数据量大时建议使用网页管理端导出。</view>
+  </view>
+
+  <view class="export-card glass">
+    <view class="export-title">👥 用户数据</view>
+    <view class="export-desc">导出全部注册用户信息（ID、用户名、角色、状态、注册时间）</view>
+    <view class="export-btn" data-type="users" bindtap="handleExport">{{exporting === 'users' ? '导出中...' : '导出 users.csv'}}</view>
+  </view>
+
+  <view class="export-card glass">
+    <view class="export-title">📋 经期记录</view>
+    <view class="export-desc">导出全部经期记录（日期、经量、痛经、症状、情绪、备注等）</view>
+    <view class="export-btn" data-type="records" bindtap="handleExport">{{exporting === 'records' ? '导出中...' : '导出 records.csv'}}</view>
+  </view>
+</view>

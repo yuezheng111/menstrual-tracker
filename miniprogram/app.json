@@ -1,25 +1,32 @@
-{
-  "pages": [
-    "pages/login/login",
-    "pages/index/index",
-    "pages/record/record",
-    "pages/records/records",
-    "pages/statistics/statistics",
-    "pages/profile/profile"
-  ],
-  "window": {
-    "navigationBarTitleText": "\u6696\u6696\u7ecf\u671f\u8bb0\u5f55",
-    "navigationBarTextStyle": "black",
-    "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#fdf2f8",
-    "backgroundTextStyle": "dark"
-  },
-  "usingComponents": {
-    "glass-card": "/components/glass-card/glass-card",
-    "cute-btn": "/components/cute-btn/cute-btn",
-    "stat-item": "/components/stat-item/stat-item",
-    "cycle-ring": "/components/cycle-ring/cycle-ring"
-  },
-  "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
-}
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/record/record",
+    "pages/records/records",
+    "pages/statistics/statistics",
+    "pages/profile/profile",
+    "pages/admin/login/login",
+    "pages/admin/change-password/change-password",
+    "pages/admin/index/index",
+    "pages/admin/users/users",
+    "pages/admin/tags/tags",
+    "pages/admin/admins/admins",
+    "pages/admin/exports/exports"
+  ],
+  "window": {
+    "navigationBarTitleText": "暖暖经期记录",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#fdf2f8",
+    "backgroundTextStyle": "dark"
+  },
+  "usingComponents": {
+    "glass-card": "/components/glass-card/glass-card",
+    "cute-btn": "/components/cute-btn/cute-btn",
+    "stat-item": "/components/stat-item/stat-item",
+    "cycle-ring": "/components/cycle-ring/cycle-ring"
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

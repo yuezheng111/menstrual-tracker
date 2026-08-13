@@ -71,6 +71,9 @@
       <view wx:else class="no-data">暂无症状数据</view>
     </glass-card>
 
+    <!-- Disclaimer -->
+    <view class="disclaimer">⚠️ 预测信息仅供参考，请以实际身体感受为准</view>
+
     <!-- Bottom space -->
     <view style="height:30px"></view>
   </view>

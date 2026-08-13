@@ -10,4 +10,6 @@ public interface SymptomTagRepository extends JpaRepository<SymptomTag, Long> {
     List<SymptomTag> findByUserIdAndDeletedFalseOrderBySortOrderAsc(Long userId);
     Optional<SymptomTag> findByIdAndUserIdAndDeletedFalse(Long id, Long userId);
     boolean existsByUserIdAndNameAndTypeAndDeletedFalse(Long userId, String name, String type);
+
+    List<SymptomTag> findByType(String type);
 }

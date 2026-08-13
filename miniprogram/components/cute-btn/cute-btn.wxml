@@ -1,1 +1,1 @@
-<view class="cute-btn {{type==='small'?'btn-sm':''}} {{loading?'loading':''}}" style="width:{{block?'100%':'auto'}}" bindtap="onTap"><text>{{loading?loadingText:text}}</text></view>
+<view class="cute-btn {{type==='small'?'btn-sm':''}} {{loading?'loading':''}}" style="width:{{block?'100%':'auto'}}" catchtap="onTap"><text>{{loading?loadingText:text}}</text></view>

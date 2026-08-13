@@ -10,8 +10,6 @@ import com.menstrualtracker.record.repository.MenstrualRecordRepository;
 import com.menstrualtracker.statistics.dto.CycleHistoryDTO;
 import com.menstrualtracker.statistics.dto.StatisticsOverviewDTO;
 import com.menstrualtracker.statistics.dto.SymptomFrequencyDTO;
-import com.menstrualtracker.user.entity.User;
-import com.menstrualtracker.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StatisticsService {
-    private final UserRepository userRepository;
     private final MenstrualRecordRepository recordRepository;
     private final ObjectMapper objectMapper;
     private final CacheService cacheService;
@@ -42,7 +39,6 @@ public class StatisticsService {
         }
 
         // 2. 缓存未命中，计算统计
-        User user = userRepository.findById(userId).orElseThrow(() -> BusinessException.notFound("User not found"));
         List<MenstrualRecord> records = recordRepository.findByUserIdAndDeletedFalseOrderByStartDateDesc(userId);
         if (records.isEmpty()) return ApiResponse.success(StatisticsOverviewDTO.builder().totalCycles(0).totalRecords(0).build());
         List<MenstrualRecord> chronological = new ArrayList<>(records);
@@ -59,8 +55,8 @@ public class StatisticsService {
             countSymptoms(symptomCount, r.getSymptoms());
         }
         MenstrualRecord last = chronological.get(chronological.size() - 1);
-        int avgCycle = user.getAvgCycleDays() != null ? user.getAvgCycleDays() : 28;
-        int avgPeriod = user.getAvgPeriodDays() != null ? user.getAvgPeriodDays() : 5;
+        int avgCycle = 28;
+        int avgPeriod = 5;
         CycleCalculator.PredictionResult prediction = CycleCalculator.predict(last.getStartDate(), avgCycle, avgPeriod);
         List<CycleHistoryDTO> recentCycles = new ArrayList<>();
         int startIdx = Math.max(0, chronological.size() - 6);

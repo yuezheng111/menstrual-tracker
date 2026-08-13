@@ -1,1 +1,1 @@
-<view class="glass-card {{customClass}}" style="{{customStyle}}" bindtap="onTap"><slot /></view>
+<view class="glass-card {{customClass}}" style="{{customStyle}}" catchtap="onTap"><slot /></view>

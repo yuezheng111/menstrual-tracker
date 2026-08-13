@@ -1,4 +1,4 @@
-﻿const api = require('../../utils/api')
+const api = require('../../utils/api')
 
 Page({
   data: {
@@ -49,9 +49,20 @@ Page({
       const api = require("../../utils/api")
       await api.del("/records/" + this.data.recordId)
       wx.showToast({ title: "已删除", icon: "success" })
+      this.refreshHome()
       wx.navigateBack()
     } catch (e) {
       wx.showToast({ title: "删除失败", icon: "none" })
+    }
+  },
+
+
+  refreshHome() {
+    const pages = getCurrentPages()
+    for (const pg of pages) {
+      if (pg.route === 'pages/index/index' && typeof pg.loadData === 'function') {
+        pg.loadData()
+      }
     }
   },
 
@@ -89,10 +100,20 @@ Page({
   },
 
   onStartDateChange(e) {
-    this.setData({ 'form.startDate': e.detail.value })
+    const start = e.detail.value
+    const patch = { 'form.startDate': start }
+    if (this.data.form.endDate && this.data.form.endDate < start) {
+      patch['form.endDate'] = start
+    }
+    this.setData(patch)
   },
   onEndDateChange(e) {
-    this.setData({ 'form.endDate': e.detail.value })
+    const end = e.detail.value
+    const patch = { 'form.endDate': end }
+    if (this.data.form.startDate && end < this.data.form.startDate) {
+      patch['form.endDate'] = this.data.form.startDate
+    }
+    this.setData(patch)
   },
 
   selectFlow(e) {
@@ -138,9 +159,15 @@ Page({
       wx.showToast({ title: '请选择开始日期', icon: 'none' })
       return
     }
+    if (this.data.form.endDate && this.data.form.endDate < this.data.form.startDate) {
+      wx.showToast({ title: '结束日期不能早于开始日期', icon: 'none' })
+      return
+    }
+    if (this.data.saving) return
     this.setData({ saving: true })
     try {
       const payload = { ...this.data.form }
+      if (!payload.endDate) payload.endDate = payload.startDate
       if (this.data.isEditing) {
         await api.put('/records/' + this.data.recordId, payload)
         wx.showToast({ title: '记录已更新', icon: 'success' })
@@ -148,6 +175,7 @@ Page({
         await api.post('/records', payload)
         wx.showToast({ title: '记录已保存', icon: 'success' })
       }
+      this.refreshHome()
       wx.navigateBack()
     } catch (e) {
       wx.showToast({ title: '保存失败，请重试', icon: 'none' })

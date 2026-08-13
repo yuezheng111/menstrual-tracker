@@ -104,6 +104,32 @@ public class CacheService {
     /**
      * 获取所有匹配模式的 key 集合（用于小范围查询）
      */
+    /**
+     * 删除指定用户的所有会话 Token（禁用用户 / 重置密码时调用）。
+     * Token 键格式为 menstrual:token:{token}，值为 userId，因此需扫描后按值过滤。
+     */
+    public void deleteUserSessions(Long userId) {
+        try {
+            Set<String> keys = redisTemplate.keys("menstrual:token:*");
+            if (keys == null || keys.isEmpty()) {
+                return;
+            }
+            List<String> toDelete = new ArrayList<>();
+            for (String key : keys) {
+                Object value = redisTemplate.opsForValue().get(key);
+                if (value != null && userId.toString().equals(String.valueOf(value))) {
+                    toDelete.add(key);
+                }
+            }
+            if (!toDelete.isEmpty()) {
+                redisTemplate.delete(toDelete);
+                log.info("Deleted {} session token(s) for userId={}", toDelete.size(), userId);
+            }
+        } catch (Exception e) {
+            log.warn("Redis deleteUserSessions failed (degraded): userId={}, error={}", userId, e.getMessage());
+        }
+    }
+
     public Set<String> keys(String pattern) {
         try {
             return redisTemplate.keys(pattern);

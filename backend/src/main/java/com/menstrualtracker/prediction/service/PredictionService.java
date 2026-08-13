@@ -9,8 +9,6 @@ import com.menstrualtracker.prediction.entity.CyclePrediction;
 import com.menstrualtracker.prediction.repository.CyclePredictionRepository;
 import com.menstrualtracker.record.entity.MenstrualRecord;
 import com.menstrualtracker.record.repository.MenstrualRecordRepository;
-import com.menstrualtracker.user.entity.User;
-import com.menstrualtracker.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PredictionService {
-    private final UserRepository userRepository;
     private final MenstrualRecordRepository recordRepository;
     private final CyclePredictionRepository predictionRepository;
     private final CacheService cacheService;
@@ -42,13 +39,10 @@ public class PredictionService {
         }
 
         // 2. 缓存未命中，执行计算
-        User user = userRepository.findById(userId).orElseThrow(() -> BusinessException.notFound("User not found"));
         MenstrualRecord lastRecord = recordRepository.findByUserIdAndDeletedFalseOrderByStartDateDesc(userId)
                 .stream().findFirst().orElseThrow(() -> BusinessException.badRequest("No records found for prediction"));
         CycleCalculator.PredictionResult result = CycleCalculator.predict(
-                lastRecord.getStartDate(),
-                user.getAvgCycleDays() != null ? user.getAvgCycleDays() : 28,
-                user.getAvgPeriodDays() != null ? user.getAvgPeriodDays() : 5);
+                lastRecord.getStartDate(), 28, 5);
         if (result == null) throw BusinessException.badRequest("Unable to generate prediction");
         savePrediction(userId, result);
 
@@ -68,11 +62,10 @@ public class PredictionService {
         predictionRepository.save(prediction);
     }
     public ApiResponse<List<ReminderDTO>> getReminders(Long userId, int advanceDays) {
-        User user = userRepository.findById(userId).orElseThrow(() -> BusinessException.notFound("User not found"));
         MenstrualRecord lastRecord = recordRepository.findByUserIdAndDeletedFalseOrderByStartDateDesc(userId)
                 .stream().findFirst().orElse(null);
         if (lastRecord == null) return ApiResponse.success(List.of());
-        int avgCycle = user.getAvgCycleDays() != null ? user.getAvgCycleDays() : 28;
+        int avgCycle = 28;
         LocalDate nextPeriod = lastRecord.getStartDate().plusDays(avgCycle);
         List<CycleCalculator.Reminder> reminders = CycleCalculator.generateReminders(nextPeriod, advanceDays);
         List<ReminderDTO> dtos = reminders.stream()
