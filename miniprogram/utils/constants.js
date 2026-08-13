@@ -1,5 +1,5 @@
 /** App Constants */
-const API_BASE = 'http://localhost:8080/api'
+const { API_BASE } = require('../config')
 
 const FLOW_OPTIONS = [
   { value: 'LIGHT', label: '少', emoji: '💌' },

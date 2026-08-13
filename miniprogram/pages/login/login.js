@@ -13,6 +13,14 @@ Page({
     }
   },
 
+  openAgreement() {
+    wx.navigateTo({ url: '/pages/agreement/agreement' })
+  },
+
+  openPrivacy() {
+    wx.navigateTo({ url: '/pages/privacy/privacy' })
+  },
+
   handleWxLogin() {
     this.setData({ loading: true })
     wx.login({
