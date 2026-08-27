@@ -2,6 +2,7 @@ package com.menstrualtracker.admin.controller;
 
 import com.menstrualtracker.admin.service.AdminAdminService;
 import com.menstrualtracker.common.dto.ApiResponse;
+import com.menstrualtracker.admin.dto.AdminAccountDTO;
 import com.menstrualtracker.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +22,7 @@ public class AdminAdminController {
 
     @GetMapping
     @Operation(summary = "List all admin accounts")
-    public ApiResponse<List<User>> listAdmins() {
+    public ApiResponse<List<AdminAccountDTO>> listAdmins() {
         return ApiResponse.success(adminAdminService.listAdmins());
     }
 

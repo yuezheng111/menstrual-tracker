@@ -43,3 +43,8 @@ backend/src/main/resources/application-dev.yml
 backend/src/main/resources/application-prod.yml
 docker-compose.yml
 backend/src/main/java/com/menstrualtracker/common/config/DataInitializer.java
+
+
+# Archive files
+*.tar.gz
+*.zip

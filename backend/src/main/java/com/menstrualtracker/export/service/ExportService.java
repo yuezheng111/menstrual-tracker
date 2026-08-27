@@ -1,5 +1,6 @@
 package com.menstrualtracker.export.service;
 import com.menstrualtracker.common.exception.BusinessException;
+import com.menstrualtracker.common.util.CsvSanitizer;
 import com.menstrualtracker.record.entity.MenstrualRecord;
 import com.menstrualtracker.record.repository.MenstrualRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,13 @@ public class ExportService {
              CSVPrinter printer = new CSVPrinter(writer, CSVFormat.DEFAULT
                      .withHeader("ID","Start Date","End Date","Flow","Pain Level","Color","Clots","Symptoms","Mood Tags","Cycle Day","Notes"))) {
             for (MenstrualRecord r : records) {
-                printer.printRecord(r.getId(),r.getStartDate(),r.getEndDate(),r.getFlow(),r.getPainLevel(),r.getColor(),
-                        r.getClots(),r.getSymptoms(),r.getMoodTags(),r.getCycleDay(),r.getNotes());
+                printer.printRecord(r.getId(),r.getStartDate(),r.getEndDate() == null ? null : CsvSanitizer.sanitize(r.getEndDate().toString()),
+                       r.getFlow() == null ? null : CsvSanitizer.sanitize(r.getFlow()),
+                       r.getPainLevel() == null ? null : CsvSanitizer.sanitize(r.getPainLevel()),
+                       r.getColor() == null ? null : CsvSanitizer.sanitize(r.getColor()),
+                       r.getClots(), CsvSanitizer.sanitize(r.getSymptoms()),
+                       CsvSanitizer.sanitize(r.getMoodTags()), r.getCycleDay(),
+                       CsvSanitizer.sanitize(r.getNotes()));
             }
             printer.flush();
             return baos.toByteArray();

@@ -33,7 +33,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final ClientIpResolver clientIpResolver;
 
     private static final String RATE_KEY_PREFIX = "menstrual:rate:ip:";
-    private static final int MAX_REQUESTS_PER_MINUTE = 30;
+    private static final int MAX_REQUESTS_PER_MINUTE = 120;
     private static final long WINDOW_SECONDS = 60;
 
     @Override

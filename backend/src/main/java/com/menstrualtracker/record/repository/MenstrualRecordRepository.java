@@ -35,4 +35,12 @@ public interface MenstrualRecordRepository extends JpaRepository<MenstrualRecord
 
     @Query(value = "SELECT symptoms, COUNT(*) FROM menstrual_records WHERE symptoms IS NOT NULL AND symptoms != '' AND deleted = 0 GROUP BY symptoms ORDER BY COUNT(*) DESC LIMIT :limit", nativeQuery = true)
     java.util.List<Object[]> findTopSymptoms(@Param("limit") int limit);
+
+        @Query("SELECT r FROM MenstrualRecord r WHERE r.userId = :userId AND r.deleted = false "
+           + "AND FUNCTION('YEAR', r.startDate) = :year ORDER BY r.startDate DESC")
+    Page<MenstrualRecord> findByUserIdAndYear(@Param("userId") Long userId, @Param("year") int year, Pageable pageable);
+
+        @Query("SELECT r FROM MenstrualRecord r WHERE r.userId = :userId AND r.deleted = false "
+           + "AND FUNCTION('YEAR', r.startDate) = :year AND FUNCTION('MONTH', r.startDate) = :month ORDER BY r.startDate DESC")
+    Page<MenstrualRecord> findByUserIdAndYearAndMonth(@Param("userId") Long userId, @Param("year") int year, @Param("month") int month, Pageable pageable);
 }

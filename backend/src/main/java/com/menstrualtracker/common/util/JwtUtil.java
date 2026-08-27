@@ -65,11 +65,21 @@ public class JwtUtil {
         try {
             parseToken(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            log.warn("Token expired: {}", e.getMessage());
         } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             log.warn("Invalid token: {}", e.getMessage());
         }
         return false;
+    }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            parseToken(token);
+            return false;
+        } catch (ExpiredJwtException e) {
+            log.warn("Token expired: {}", e.getMessage());
+            return true;
+        } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }

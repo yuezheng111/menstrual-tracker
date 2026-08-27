@@ -25,12 +25,4 @@ public class CacheConfig {
         return new TokenBlacklistCache(tokenBlacklistCache);
     }
 
-    @Bean
-    public Cache<String, String> verificationCodeCache() {
-        return CacheBuilder.newBuilder()
-                .maximumSize(5000)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
-                .recordStats()
-                .build();
-    }
 }

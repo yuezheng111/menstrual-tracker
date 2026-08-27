@@ -3,7 +3,7 @@
     <div class="toolbar">
       <el-input
         v-model="keyword"
-        placeholder="搜索用户名"
+        placeholder="搜索用户名/昵称"
         clearable
         style="width: 300px"
         @keyup.enter="handleSearch"
@@ -18,6 +18,9 @@
     <el-table :data="users" v-loading="loading" stripe>
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="username" label="用户名" min-width="120" />
+      <el-table-column prop="nickname" label="昵称" min-width="120">
+        <template #default="{ row }">{{ row.nickname || '-' }}</template>
+      </el-table-column>
       <el-table-column prop="recordCount" label="记录数" width="90" />
       <el-table-column prop="role" label="角色" width="90">
         <template #default="{ row }">

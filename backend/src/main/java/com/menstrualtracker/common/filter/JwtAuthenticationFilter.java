@@ -47,27 +47,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
 
+        if (token != null && jwtUtil.isTokenExpired(token)) {
+            log.info("Token expired, rejecting request: uri={}", request.getRequestURI());
+            writeUnauthorized(response);
+            return;
+        }
+
         if (token != null && jwtUtil.validateToken(token)) {
             Long userId = jwtUtil.getUserIdFromToken(token);
             String tokenKey = String.format(TOKEN_CACHE_KEY, token);
 
             // 1. 先查本地黑名单（Redis 宕机时仍能识别已注销的 Token）
             if (tokenBlacklistCache.contains(token)) {
-                log.info("Token found in local blacklist (user logged out, Redis degraded): userId={}", userId);
-                filterChain.doFilter(request, response);
+                log.info("Token found in local blacklist (user logged out): userId={}", userId);
+                writeUnauthorized(response);
                 return;
             }
 
             // 2. 再查 Redis 会话映射
             Boolean sessionExists = cacheService.exists(tokenKey);
-
-            if (sessionExists != null && !sessionExists) {
-                // Redis 明确返回 false，表示 Token 已被注销
-                log.info("Token not found in Redis session (user logged out): userId={}", userId);
-                filterChain.doFilter(request, response);
+            if (sessionExists == null) {
+                log.warn("Redis unavailable; rejecting token to prevent stale-session access: userId={}", userId);
+                writeUnauthorized(response);
                 return;
             }
-            // sessionExists == null 表示 Redis 不可用 → 降级，本地黑名单已在步骤 1 兜底，信任 JWT
+            if (!sessionExists) {
+                log.info("Token not found in Redis session (user logged out): userId={}", userId);
+                writeUnauthorized(response);
+                return;
+            }
 
             String role = jwtUtil.getRoleFromToken(token);
             if ("ADMIN".equals(role) && !"/api/admin/password/change".equals(request.getRequestURI())) {
@@ -100,5 +108,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private void writeUnauthorized(HttpServletResponse response) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(401);
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(401, "Unauthorized")));
     }
 }

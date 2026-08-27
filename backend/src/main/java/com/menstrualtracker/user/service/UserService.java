@@ -1,5 +1,6 @@
 package com.menstrualtracker.user.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.menstrualtracker.common.cache.CacheService;
 import com.menstrualtracker.common.cache.LoginRateLimiter;
 import com.menstrualtracker.common.cache.TokenBlacklistCache;
@@ -15,11 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +35,7 @@ public class UserService {
     private final CacheService cacheService;
     private final LoginRateLimiter loginRateLimiter;
     private final TokenBlacklistCache tokenBlacklistCache;
+    private final RestTemplate restTemplate;
 
     @Value("${wechat.app-id}")
     private String wechatAppId;
@@ -42,18 +43,18 @@ public class UserService {
     @Value("${wechat.app-secret}")
     private String wechatAppSecret;
 
-    // Token 濞村吋淇洪惁鐣岀磽閹惧磭鎽犻柨?濠㈠灈鏅槐娆愮▔?JWT 閺夆晛娲﹀﹢锟犲籍閸洘锛熷☉鎾亾闁肩柉鎻槐?
+    // Redis-backed session map makes logout effective before the JWT expires.
     private static final String TOKEN_CACHE_KEY = "menstrual:token:%s";
-    private static final long TOKEN_CACHE_TTL = 7; // 濠?
+    private static final long TOKEN_CACHE_TTL = 7;
 
-    // 鐎甸偊鍠曟穱?access_token 缂傚倹鎸搁悺銊╂晬?000缂?
     private static final String WECHAT_TOKEN_KEY = "menstrual:wechat:access_token";
-    private static final long WECHAT_TOKEN_TTL = 7000; // 缂?
+    private static final long WECHAT_TOKEN_TTL = 7_000;
 
     @Transactional
     public ApiResponse<LoginResponse> register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername()))
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw BusinessException.conflict("Username already exists");
+        }
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -61,13 +62,12 @@ public class UserService {
                 .build();
         user = userRepository.save(user);
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        // 閻忓繐妫旂槐鎵嫚濠靛洦衼閻忓繐瀚悺銊╁礂?Redis闁?濠㈠灈鏅炵换鍐嫉閻曞倻绀?
-        cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(), TOKEN_CACHE_TTL, TimeUnit.DAYS);
+        cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(),
+                TOKEN_CACHE_TTL, TimeUnit.DAYS);
         return ApiResponse.success("Registration successful", buildLoginResponse(user, token));
     }
 
     public ApiResponse<LoginResponse> login(LoginRequest request, String clientIp) {
-        // 閺堫剙婀撮梽鎰ウ閿涘牅绗夋笟婵婄 Redis閿?
         String username = request.getUsername();
         if (loginRateLimiter.isBlocked(clientIp, username)) {
             throw BusinessException.tooManyRequests("Too many login attempts, please try again later");
@@ -82,37 +82,31 @@ public class UserService {
             throw BusinessException.forbidden("Account has been disabled");
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        // 閻忓繐妫旂槐鎵嫚濠靛洦衼閻忓繐瀚悺銊╁礂?Redis闁?濠㈠灈鏅炵换鍐嫉閻曞倻绀?
-        cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(), TOKEN_CACHE_TTL, TimeUnit.DAYS);
+        cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(),
+                TOKEN_CACHE_TTL, TimeUnit.DAYS);
         loginRateLimiter.onSuccess(clientIp, username);
         return ApiResponse.success("Login successful", buildLoginResponse(user, token));
     }
 
-    /**
-     * 闁活潿鍔嶉崺娑樷枖閵娾晜鏁?闁?闁告帞濞€濞?Redis 濞戞搩鍘惧▓?Token 濞村吋淇洪惁浠嬪及閻樿尙娈搁柕?
-     */
     public ApiResponse<Void> logout(String token) {
         if (token != null && !token.isEmpty()) {
-            // 1. 尝试从 Redis 删除
             cacheService.delete(String.format(TOKEN_CACHE_KEY, token));
-            // 2. 本地黑名单兜底（Redis 宕机时仍生效）
             tokenBlacklistCache.add(token);
-            log.info("User logged out, token session removed from Redis + local blacklist");
+            log.info("User logged out; session removed from Redis and blacklisted locally");
         }
         return ApiResponse.success("Logged out", null);
     }
 
     public ApiResponse<LoginResponse> wxLogin(String code, String clientIp) {
-        // 閺堫剙婀撮梽鎰ウ閿涘牅绗夋笟婵婄 Redis閿?
         if (loginRateLimiter.isBlocked(clientIp, "wx-login")) {
             throw BusinessException.tooManyRequests("Too many login attempts, please try again later");
         }
-        String openId;
 
+        String openId;
         if (wechatAppId.startsWith("test_")) {
             openId = "mock_fixed_user";
         } else {
-            openId = callWeChatApi(code);
+            openId = exchangeCodeForOpenId(code);
             if (openId == null) {
                 loginRateLimiter.onFailure(clientIp, "wx-login");
                 throw BusinessException.badRequest("WeChat login failed");
@@ -120,7 +114,6 @@ public class UserService {
         }
 
         User user = userRepository.findByOpenId(openId).orElse(null);
-
         if (user == null) {
             user = User.builder()
                     .username(generateWxUsername(openId))
@@ -131,15 +124,14 @@ public class UserService {
                     .build();
             user = userRepository.save(user);
         }
-
-        if (user != null && !Boolean.TRUE.equals(user.getEnabled())) {
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
             loginRateLimiter.onFailure(clientIp, "wx-login");
             throw BusinessException.forbidden("Account has been disabled");
         }
 
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
-        // 閻忓繐妫旂槐鎵嫚濠靛洦衼閻忓繐瀚悺銊╁礂?Redis闁?濠㈠灈鏅炵换鍐嫉閻曞倻绀?
-        cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(), TOKEN_CACHE_TTL, TimeUnit.DAYS);
+        cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(),
+                TOKEN_CACHE_TTL, TimeUnit.DAYS);
         loginRateLimiter.onSuccess(clientIp, "wx-login");
         return ApiResponse.success("Login successful", buildLoginResponse(user, token));
     }
@@ -154,7 +146,9 @@ public class UserService {
     public ApiResponse<UserProfileDTO> updateProfile(Long userId, UserProfileDTO request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> BusinessException.notFound("User not found"));
-        if (request.getAvatar() != null) user.setAvatar(request.getAvatar());
+        if (request.getAvatar() != null) {
+            user.setAvatar(request.getAvatar());
+        }
         if (request.getNickname() != null) {
             String nickname = request.getNickname().trim();
             if (nickname.isEmpty()) {
@@ -172,6 +166,66 @@ public class UserService {
         return ApiResponse.success("Profile updated", toProfileDTO(user));
     }
 
+    public String getWechatAccessToken() {
+        Object cached = cacheService.get(WECHAT_TOKEN_KEY);
+        if (cached instanceof String accessToken && !accessToken.isEmpty()) {
+            return accessToken;
+        }
+
+        URI uri = UriComponentsBuilder.fromHttpUrl("https://api.weixin.qq.com/cgi-bin/token")
+                .queryParam("grant_type", "client_credential")
+                .queryParam("appid", wechatAppId)
+                .queryParam("secret", wechatAppSecret)
+                .build()
+                .encode()
+                .toUri();
+
+        try {
+            JsonNode response = restTemplate.getForObject(uri, JsonNode.class);
+            if (response != null && response.hasNonNull("access_token")) {
+                String accessToken = response.get("access_token").asText();
+                cacheService.set(WECHAT_TOKEN_KEY, accessToken, WECHAT_TOKEN_TTL, TimeUnit.SECONDS);
+                log.info("WeChat access_token refreshed and cached");
+                return accessToken;
+            }
+            logWechatError("access_token", response);
+        } catch (Exception e) {
+            log.error("WeChat access_token request failed", e);
+        }
+        return null;
+    }
+
+    private String exchangeCodeForOpenId(String code) {
+        URI uri = UriComponentsBuilder
+                .fromHttpUrl("https://api.weixin.qq.com/sns/jscode2session")
+                .queryParam("appid", wechatAppId)
+                .queryParam("secret", wechatAppSecret)
+                .queryParam("js_code", code)
+                .queryParam("grant_type", "authorization_code")
+                .build()
+                .encode()
+                .toUri();
+
+        try {
+            JsonNode response = restTemplate.getForObject(uri, JsonNode.class);
+            if (response != null && response.hasNonNull("openid")) {
+                return response.get("openid").asText();
+            }
+            logWechatError("jscode2session", response);
+        } catch (Exception e) {
+            log.error("WeChat jscode2session request failed", e);
+        }
+        return null;
+    }
+
+    private void logWechatError(String operation, JsonNode response) {
+        int errorCode = response != null && response.hasNonNull("errcode")
+                ? response.get("errcode").asInt() : -1;
+        String errorMessage = response != null && response.hasNonNull("errmsg")
+                ? response.get("errmsg").asText() : "unknown response";
+        log.error("WeChat {} failed: code={}, message={}", operation, errorCode, errorMessage);
+    }
+
     private String generateWxUsername(String openId) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -182,99 +236,23 @@ public class UserService {
             }
             return sb.toString();
         } catch (Exception e) {
-            log.warn("Failed to hash openId, falling back to openId hash code", e);
+            log.warn("Failed to hash openId; falling back to hashCode", e);
             return "wx_" + Integer.toHexString(openId.hashCode());
         }
     }
 
-
-    private String callWeChatApi(String code) {
-        try {
-            String urlStr = "https://api.weixin.qq.com/sns/jscode2session"
-                    + "?appid=" + wechatAppId
-                    + "&secret=" + wechatAppSecret
-                    + "&js_code=" + code
-                    + "&grant_type=authorization_code";
-            URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder resp = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) resp.append(line);
-            reader.close();
-            String json = resp.toString();
-            if (json.contains("\"openid\"")) {
-                int start = json.indexOf("\"openid\"") + 9;
-                start = json.indexOf("\"", start) + 1;
-                int end = json.indexOf("\"", start);
-                return json.substring(start, end);
-            }
-            log.error("WeChat API error: {}", json);
-            return null;
-        } catch (Exception e) {
-            log.error("WeChat API call failed", e);
-            return null;
-        }
-    }
-
-    /**
-     * 闁兼儳鍢茶ぐ鍥ь嚗椤旇绻?access_token 闁?濞村吋锚閸樻稒绂?Redis 閻犲洩顕цぐ鍥晬鐏炵偓寮撻柛娑欏灊閼垫垿宕氬▎鎺旀闁活潿鍔屾禍鏇熺┍閳╁啫澶嶉柛娆欑到閼荤喓绱撻幘宕囨憼闁?000缂佸甯槐姘跺Υ?
-     * 闁活潿鍔嬬花顒勫触鎼达絿鏁鹃悹瀣暟閺併倕顕ラ璁崇箚闁稿繑婀圭划顒勫嫉瀹ュ懎顫ょ紒鏃戝灡鐢挳宕ｉ敐蹇曠濠碘€冲€歌ぐ鍌炴焻娴ｉ紦渚€寮堕幐搴Ｐラ柟顓у灲缁辨岸濡?
-     */
-    public String getWechatAccessToken() {
-        // 1. 闁?Redis 缂傚倹鎸搁悺?
-        Object cached = cacheService.get(WECHAT_TOKEN_KEY);
-        if (cached instanceof String && !((String) cached).isEmpty()) {
-            log.debug("WeChat access_token hit from Redis cache");
-            return (String) cached;
-        }
-
-        // 2. 缂傚倹鎸搁悺銊╁嫉椤忓嫭鍤掑☉鎿冨弿缁辨繄鎷崘顏呮殢鐎甸偊鍠曟穱濠囧箳閵夈儱缍撻柤鎯у槻瑜?
-        try {
-            String urlStr = "https://api.weixin.qq.com/cgi-bin/token"
-                    + "?grant_type=client_credential"
-                    + "&appid=" + wechatAppId
-                    + "&secret=" + wechatAppSecret;
-            URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(5000);
-            conn.setReadTimeout(5000);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder resp = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) resp.append(line);
-            reader.close();
-            String json = resp.toString();
-            if (json.contains("\"access_token\"")) {
-                int start = json.indexOf("\"access_token\"") + 16;
-                start = json.indexOf("\"", start) + 1;
-                int end = json.indexOf("\"", start);
-                String accessToken = json.substring(start, end);
-                // 3. 闁告劖鐟ラ崣?Redis 缂傚倹鎸搁悺銊╂晬?000缂佸甯槐婵囩▔鎼粹€茬俺濞ｅ毝銈囩闁搞儳鍋熷▓?expires_in 闁规亽鍎寸换搴ㄦ晬?
-                cacheService.set(WECHAT_TOKEN_KEY, accessToken, WECHAT_TOKEN_TTL, TimeUnit.SECONDS);
-                log.info("WeChat access_token retrieved and cached");
-                return accessToken;
-            }
-            log.error("Failed to get WeChat access_token: {}", json);
-        } catch (Exception e) {
-            log.error("WeChat access_token API call failed", e);
-        }
-        return null;
-    }
-
     private LoginResponse buildLoginResponse(User user, String token) {
-        return LoginResponse.builder().token(token).tokenType("Bearer").expiresIn(86400000L).user(toProfileDTO(user)).build();
+        return LoginResponse.builder()
+                .token(token).tokenType("Bearer").expiresIn(86_400_000L)
+                .user(toProfileDTO(user))
+                .build();
     }
 
     private UserProfileDTO toProfileDTO(User user) {
         return UserProfileDTO.builder()
                 .id(user.getId()).username(user.getUsername())
-                .nickname(user.getNickname())
-                .avatar(user.getAvatar())
-                .role(user.getRole()).build();
+                .nickname(user.getNickname()).avatar(user.getAvatar())
+                .role(user.getRole())
+                .build();
     }
 }

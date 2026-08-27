@@ -29,7 +29,7 @@ public class AdminUserService {
         Pageable pageable = PageRequest.of(Math.max(0, page), Math.min(100, Math.max(1, size)));
         Page<User> users;
         if (keyword != null && !keyword.isBlank()) {
-            users = userRepository.findByUsernameContaining(keyword, pageable);
+            users = userRepository.searchByUsernameOrNickname(keyword, pageable);
         } else {
             users = userRepository.findAll(pageable);
         }
@@ -54,6 +54,7 @@ public class AdminUserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> BusinessException.notFound("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangeRequired(true);
         userRepository.save(user);
         // 重置密码后使现有会话失效
         cacheService.deleteUserSessions(userId);
@@ -64,6 +65,7 @@ public class AdminUserService {
         return AdminUserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .nickname(user.getNickname())
                 .role(user.getRole())
                 .enabled(user.getEnabled())
                 .recordCount(recordCount)

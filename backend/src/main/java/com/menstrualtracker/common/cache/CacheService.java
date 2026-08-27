@@ -110,7 +110,7 @@ public class CacheService {
      */
     public void deleteUserSessions(Long userId) {
         try {
-            Set<String> keys = redisTemplate.keys("menstrual:token:*");
+            Set<String> keys = scanKeys("menstrual:token:*");
             if (keys == null || keys.isEmpty()) {
                 return;
             }
@@ -132,11 +132,26 @@ public class CacheService {
 
     public Set<String> keys(String pattern) {
         try {
-            return redisTemplate.keys(pattern);
+            return scanKeys(pattern);
         } catch (Exception e) {
             log.warn("Redis KEYS failed (degraded): pattern={}, error={}", pattern, e.getMessage());
             return Set.of();
         }
+    }
+
+    // SCAN iterates incrementally; unlike KEYS it does not block the server.
+    private Set<String> scanKeys(String pattern) {
+        Set<String> result = new java.util.HashSet<>();
+        redisTemplate.executeWithStickyConnection(connection -> {
+            try (Cursor<byte[]> cursor = connection.scan(
+                    ScanOptions.scanOptions().match(pattern).count(100).build())) {
+                while (cursor.hasNext()) {
+                    result.add(new String(cursor.next(), StandardCharsets.UTF_8));
+                }
+            }
+            return null;
+        });
+        return result;
     }
 
     // ==================== 分布式计数器（用于限流） ====================

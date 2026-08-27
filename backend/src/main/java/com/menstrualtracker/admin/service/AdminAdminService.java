@@ -1,6 +1,7 @@
 package com.menstrualtracker.admin.service;
 
 import com.menstrualtracker.common.exception.BusinessException;
+import com.menstrualtracker.admin.dto.AdminAccountDTO;
 import com.menstrualtracker.user.entity.User;
 import com.menstrualtracker.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,10 @@ public class AdminAdminService {
 
     private final UserRepository userRepository;
 
-    public List<User> listAdmins() {
-        return userRepository.findByRole("ADMIN");
+    public List<AdminAccountDTO> listAdmins() {
+        return userRepository.findByRole("ADMIN").stream()
+            .map(this::toDTO)
+            .toList();
     }
 
     @Transactional
@@ -39,5 +42,17 @@ public class AdminAdminService {
         }
         user.setRole("USER");
         return userRepository.save(user);
+    }
+
+    private AdminAccountDTO toDTO(User user) {
+        return AdminAccountDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .role(user.getRole())
+                .enabled(user.getEnabled())
+                .passwordChangeRequired(user.getPasswordChangeRequired())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }

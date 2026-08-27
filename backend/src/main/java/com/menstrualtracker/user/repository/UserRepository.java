@@ -15,7 +15,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     Optional<User> findByOpenId(String openId);
 
-    Page<User> findByUsernameContaining(String username, Pageable pageable);
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR (u.nickname IS NOT NULL AND LOWER(u.nickname) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<User> searchByUsernameOrNickname(@Param("keyword") String keyword, Pageable pageable);
 
     List<User> findByRole(String role);
 
@@ -23,6 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     long countByRole(String role);
 
-    @Query("SELECT u.createdAt AS d, COUNT(u) FROM User u WHERE u.createdAt >= :since GROUP BY FUNCTION('DATE', u.createdAt) ORDER BY d")
+    @Query("SELECT FUNCTION('DATE', u.createdAt) AS d, COUNT(u) FROM User u WHERE u.createdAt >= :since GROUP BY FUNCTION('DATE', u.createdAt) ORDER BY d")
     java.util.List<Object[]> countUsersByDay(@Param("since") java.time.LocalDateTime since);
 }

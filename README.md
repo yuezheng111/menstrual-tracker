@@ -1,6 +1,7 @@
 # Menstrual Tracker
 
-A comprehensive menstrual cycle tracking and prediction application built with Spring Boot 3.x + Vue 3.
+A comprehensive menstrual cycle tracking and prediction application built with
+Spring Boot 3.x and a WeChat mini program client.
 
 ## Tech Stack
 - Backend: Spring Boot 3.4.x, Spring Security, Spring Data JPA, Flyway
@@ -8,7 +9,13 @@ A comprehensive menstrual cycle tracking and prediction application built with S
 - Auth: JWT (jjwt 0.12.x)
 - Cache/Limiting: Guava Cache + RateLimiter
 - API Docs: SpringDoc OpenAPI (Swagger UI)
-- Frontend: Vue 3 + Element Plus + Vite
+- Mini Program: WeChat native (`miniprogram/`)
+- Admin Web: Vue 3 + Element Plus + Vite (`admin-frontend/`)
+
+## Legacy
+
+The original Vue 3 web frontend has been archived to `legacy/frontend-web`.
+It is no longer built or deployed; the WeChat mini program is the primary user client.
 
 ## Quick Start
 1. Start MySQL: `docker-compose up -d db`
@@ -21,7 +28,7 @@ A comprehensive menstrual cycle tracking and prediction application built with S
    export ADMIN_PASSWORD="initial-admin-password"
    ```
 3. Run backend: `cd backend && mvn spring-boot:run`
-4. Run frontend: `cd frontend && npm install && npm run dev`
+4. Run admin web (optional): `cd admin-frontend && npm install && npm run dev`
 
 API: http://localhost:8080 | Swagger UI: http://localhost:8080/swagger-ui.html
 

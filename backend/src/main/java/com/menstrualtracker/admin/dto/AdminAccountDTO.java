@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminUserDTO {
+public class AdminAccountDTO {
     private Long id;
     private String username;
     private String nickname;
     private String role;
     private Boolean enabled;
-    private Long recordCount;
+    private Boolean passwordChangeRequired;
     private LocalDateTime createdAt;
 }

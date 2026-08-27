@@ -55,8 +55,12 @@ public class StatisticsService {
             countSymptoms(symptomCount, r.getSymptoms());
         }
         MenstrualRecord last = chronological.get(chronological.size() - 1);
-        int avgCycle = 28;
-        int avgPeriod = 5;
+        // Use the user's real averages for prediction; fall back to standard values
+        // when there is not enough history yet (e.g. only one record so far).
+        int avgCycle = (int) Math.round(cycleLengths.stream()
+                .mapToInt(Integer::intValue).average().orElse(28));
+        int avgPeriod = (int) Math.round(periodLengths.stream()
+                .mapToInt(Integer::intValue).average().orElse(5));
         CycleCalculator.PredictionResult prediction = CycleCalculator.predict(last.getStartDate(), avgCycle, avgPeriod);
         List<CycleHistoryDTO> recentCycles = new ArrayList<>();
         int startIdx = Math.max(0, chronological.size() - 6);
