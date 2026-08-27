@@ -51,6 +51,16 @@ public class UserController {
         return userService.wxLogin(request.getCode(), clientIp);
     }
 
+    @PostMapping("/refresh-token")
+    @Operation(summary = "Refresh access token using WeChat code")
+    public ApiResponse<LoginResponse> refreshToken(@Valid @RequestBody WxLoginRequest request,
+                                                   @RequestHeader(value = "Authorization", required = false) String authHeader,
+                                                   HttpServletRequest servletRequest) {
+        String clientIp = clientIpResolver.resolve(servletRequest);
+        // 支持带旧token的刷新请求
+        return userService.refreshToken(request.getCode(), authHeader, clientIp);
+    }
+
     @GetMapping("/profile")
     @Operation(summary = "Get profile")
     public ApiResponse<UserProfileDTO> getProfile(@AuthenticationPrincipal Long userId) {

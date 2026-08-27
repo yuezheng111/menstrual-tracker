@@ -1,0 +1,49 @@
+.doc-page {
+  min-height: 100vh;
+  padding: 40rpx 32rpx 80rpx;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.doc-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 32rpx;
+}
+
+.doc-update {
+  display: block;
+  font-size: 24rpx;
+  color: #909399;
+  margin-bottom: 32rpx;
+}
+
+.doc-section {
+  margin-bottom: 32rpx;
+}
+
+.doc-h {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 12rpx;
+}
+
+.doc-p {
+  display: block;
+  font-size: 28rpx;
+  line-height: 1.7;
+  color: #606266;
+  margin-bottom: 8rpx;
+}
+.icp-footer {
+  margin-top: 32rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid #eee;
+  text-align: center;
+  font-size: 24rpx;
+  color: #909399;
+}

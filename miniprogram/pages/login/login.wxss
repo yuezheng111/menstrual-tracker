@@ -68,10 +68,26 @@
   margin-top: 20px;
   font-size: 12px;
   color: #8e5580;
+  line-height: 1.8;
+}
+.agreement-check {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 4px;
+}
+.agreement-check checkbox {
+  transform: scale(0.8);
+  margin-right: 2px;
 }
 .link {
   color: #f06292;
   text-decoration: underline;
+}
+.icp-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: #b48aa8;
 }
 
 @keyframes heartBeat {

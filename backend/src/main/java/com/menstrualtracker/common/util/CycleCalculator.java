@@ -54,16 +54,27 @@ public class CycleCalculator {
     public static PredictionResult predict(LocalDate lastPeriodStart, int avgCycleDays, int avgPeriodDays) {
         if (lastPeriodStart == null) return null;
 
-        LocalDate nextStart = lastPeriodStart.plusDays(avgCycleDays);
+        int cycleDays = Math.max(1, avgCycleDays);
+        LocalDate today = LocalDate.now();
+        LocalDate nextStart = lastPeriodStart.plusDays(cycleDays);
+
+        // 已错过预测日期时，按平均周期滚动到下一个未来日期，避免出现“还有 -N 天”。
+        if (nextStart.isBefore(today)) {
+            long missedDays = ChronoUnit.DAYS.between(nextStart, today);
+            long missedCycles = (missedDays + cycleDays - 1) / cycleDays;
+            nextStart = nextStart.plusDays(missedCycles * cycleDays);
+        }
+
+        LocalDate cycleStart = nextStart.minusDays(cycleDays);
         LocalDate nextEnd = nextStart.plusDays(avgPeriodDays - 1);
 
-        int ovulationDay = avgCycleDays - 14;
-        LocalDate ovulation = lastPeriodStart.plusDays(ovulationDay);
+        int ovulationDay = cycleDays - 14;
+        LocalDate ovulation = cycleStart.plusDays(ovulationDay);
         LocalDate ovulationStart = ovulation.minusDays(1);
         LocalDate ovulationEnd = ovulation.plusDays(1);
 
-        LocalDate fertileStart = lastPeriodStart.plusDays(Math.max(0, ovulationDay - 5));
-        LocalDate fertileEnd = lastPeriodStart.plusDays(Math.min(avgCycleDays - 1, ovulationDay + 2));
+        LocalDate fertileStart = cycleStart.plusDays(Math.max(0, ovulationDay - 5));
+        LocalDate fertileEnd = cycleStart.plusDays(Math.min(cycleDays - 1, ovulationDay + 2));
 
         LocalDate safeStart = nextStart.plusDays(avgPeriodDays);
         LocalDate safeEnd = fertileStart.minusDays(1);
@@ -80,7 +91,7 @@ public class CycleCalculator {
                 .fertileWindowEnd(fertileEnd)
                 .safePeriodStart(safeStart)
                 .safePeriodEnd(safeEnd)
-                .predictedCycleLength(avgCycleDays)
+                .predictedCycleLength(cycleDays)
                 .predictedPeriodLength(avgPeriodDays)
                 .build();
     }

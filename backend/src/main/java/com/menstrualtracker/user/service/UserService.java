@@ -97,6 +97,50 @@ public class UserService {
         return ApiResponse.success("Logged out", null);
     }
 
+    public ApiResponse<LoginResponse> refreshToken(String code, String authHeader, String clientIp) {
+        if (loginRateLimiter.isBlocked(clientIp, "refresh-token")) {
+            throw BusinessException.tooManyRequests("Too many refresh attempts, please try again later");
+        }
+
+        String openId;
+        if (wechatAppId.startsWith("test_")) {
+            openId = "mock_fixed_user";
+        } else {
+            openId = exchangeCodeForOpenId(code);
+            if (openId == null) {
+                throw BusinessException.unauthorized("Failed to get WeChat OpenID");
+            }
+        }
+
+        String username = generateWxUsername(openId);
+        User user = userRepository.findByUsername(username).orElse(null);
+
+        if (user == null) {
+            throw BusinessException.notFound("User not found, please login first");
+        }
+
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+            throw BusinessException.forbidden("Account has been disabled");
+        }
+
+        // 如果有旧token，将其加入黑名单
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String oldToken = authHeader.substring(7);
+            cacheService.delete(String.format(TOKEN_CACHE_KEY, oldToken));
+            tokenBlacklistCache.add(oldToken);
+            log.info("Old token invalidated during refresh");
+        }
+
+        // 生成新token
+        String newToken = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+        cacheService.set(String.format(TOKEN_CACHE_KEY, newToken), user.getId(),
+                TOKEN_CACHE_TTL, TimeUnit.DAYS);
+        loginRateLimiter.onSuccess(clientIp, "refresh-token");
+
+        log.info("Token refreshed successfully for user: {}", username);
+        return ApiResponse.success("Token refreshed successfully", buildLoginResponse(user, newToken));
+    }
+
     public ApiResponse<LoginResponse> wxLogin(String code, String clientIp) {
         if (loginRateLimiter.isBlocked(clientIp, "wx-login")) {
             throw BusinessException.tooManyRequests("Too many login attempts, please try again later");
@@ -108,24 +152,28 @@ public class UserService {
         } else {
             openId = exchangeCodeForOpenId(code);
             if (openId == null) {
-                loginRateLimiter.onFailure(clientIp, "wx-login");
-                throw BusinessException.badRequest("WeChat login failed");
+                throw BusinessException.unauthorized("Failed to get WeChat OpenID");
             }
         }
 
-        User user = userRepository.findByOpenId(openId).orElse(null);
+        String username = generateWxUsername(openId);
+        User user = userRepository.findByUsername(username).orElse(null);
+
         if (user == null) {
             user = User.builder()
-                    .username(generateWxUsername(openId))
-                    .nickname("微信用户")
+                    .username(username)
                     .openId(openId)
                     .password(passwordEncoder.encode(openId))
                     .loginType("WECHAT")
+                    .role("USER")
+                    .enabled(true)
+                    .nickname("用户" + username.substring(3))
                     .build();
             user = userRepository.save(user);
+            log.info("New WeChat user registered: {}", username);
         }
+
         if (!Boolean.TRUE.equals(user.getEnabled())) {
-            loginRateLimiter.onFailure(clientIp, "wx-login");
             throw BusinessException.forbidden("Account has been disabled");
         }
 
@@ -133,13 +181,8 @@ public class UserService {
         cacheService.set(String.format(TOKEN_CACHE_KEY, token), user.getId(),
                 TOKEN_CACHE_TTL, TimeUnit.DAYS);
         loginRateLimiter.onSuccess(clientIp, "wx-login");
-        return ApiResponse.success("Login successful", buildLoginResponse(user, token));
-    }
 
-    public ApiResponse<UserProfileDTO> getProfile(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> BusinessException.notFound("User not found"));
-        return ApiResponse.success(toProfileDTO(user));
+        return ApiResponse.success("WeChat login successful", buildLoginResponse(user, token));
     }
 
     @Transactional
@@ -164,6 +207,12 @@ public class UserService {
         }
         user = userRepository.save(user);
         return ApiResponse.success("Profile updated", toProfileDTO(user));
+    }
+
+    public ApiResponse<UserProfileDTO> getProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> BusinessException.notFound("User not found"));
+        return ApiResponse.success("Profile retrieved", toProfileDTO(user));
     }
 
     public String getWechatAccessToken() {

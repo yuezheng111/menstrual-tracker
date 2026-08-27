@@ -22,13 +22,30 @@ class CycleCalculatorTest {
 
     @Test
     void testPredict() {
-        LocalDate lastPeriod = LocalDate.of(2026, 6, 1);
+        LocalDate lastPeriod = LocalDate.now().minusDays(10);
         CycleCalculator.PredictionResult result = CycleCalculator.predict(lastPeriod, 28, 5);
         assertNotNull(result);
-        assertEquals(LocalDate.of(2026, 6, 29), result.getNextPeriodStart());
-        assertEquals(LocalDate.of(2026, 7, 3), result.getNextPeriodEnd());
+        assertEquals(LocalDate.now().plusDays(18), result.getNextPeriodStart());
+        assertEquals(LocalDate.now().plusDays(22), result.getNextPeriodEnd());
         assertNotNull(result.getOvulationStart());
         assertNotNull(result.getOvulationEnd());
+    }
+
+    @Test
+    void testPredictRollsPastDueDateToNextFutureDate() {
+        LocalDate lastPeriod = LocalDate.now().minusDays(40);
+        CycleCalculator.PredictionResult result = CycleCalculator.predict(lastPeriod, 28, 5);
+        assertNotNull(result);
+        assertEquals(LocalDate.now().plusDays(16), result.getNextPeriodStart());
+        assertFalse(result.getNextPeriodStart().isBefore(LocalDate.now()));
+    }
+
+    @Test
+    void testPredictRollsExactMissedCycleToToday() {
+        LocalDate lastPeriod = LocalDate.now().minusDays(56);
+        CycleCalculator.PredictionResult result = CycleCalculator.predict(lastPeriod, 28, 5);
+        assertNotNull(result);
+        assertEquals(LocalDate.now(), result.getNextPeriodStart());
     }
 
     @Test
@@ -48,6 +65,13 @@ class CycleCalculatorTest {
     void testGenerateRemindersNoMatch() {
         LocalDate farFuture = LocalDate.now().plusDays(100);
         var reminders = CycleCalculator.generateReminders(farFuture, 7);
+        assertTrue(reminders.isEmpty());
+    }
+
+    @Test
+    void testGenerateRemindersIgnoresPastDates() {
+        LocalDate pastDate = LocalDate.now().minusDays(3);
+        var reminders = CycleCalculator.generateReminders(pastDate, 7);
         assertTrue(reminders.isEmpty());
     }
 }

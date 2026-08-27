@@ -23,5 +23,8 @@
     <text>退出登录</text>
   </view>
 
-  <view class="version">暖暖经期记录 v1.0.0</view>
+  <view class="version">墨鱼小日记 v1.0.0</view>
+  <view class="icp-footer">
+    <text>粤ICP备2026120683号</text>
+  </view>
 </view>

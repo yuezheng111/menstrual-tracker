@@ -85,7 +85,13 @@ public class PredictionService {
         }
 
         int avgCycle = calculateAverageCycleLength(records);
-        LocalDate nextPeriod = records.get(records.size() - 1).getStartDate().plusDays(avgCycle);
+        int avgPeriod = calculateAveragePeriodLength(records);
+        LocalDate lastStart = records.get(records.size() - 1).getStartDate();
+        CycleCalculator.PredictionResult prediction =
+                CycleCalculator.predict(lastStart, avgCycle, avgPeriod);
+        LocalDate nextPeriod = prediction != null
+                ? prediction.getNextPeriodStart()
+                : lastStart.plusDays(avgCycle);
 
         List<CycleCalculator.Reminder> reminders =
                 CycleCalculator.generateReminders(nextPeriod, advanceDays);
@@ -128,6 +134,7 @@ public class PredictionService {
                 .filter(r -> r.getStartDate() != null && r.getEndDate() != null)
                 .map(r -> CycleCalculator.calculatePeriodLength(
                         r.getStartDate(), r.getEndDate()))
+                .filter(len -> len >= 1 && len <= 31)
                 .collect(Collectors.toList());
         return (int) Math.round(lengths.stream()
                 .mapToInt(Integer::intValue)

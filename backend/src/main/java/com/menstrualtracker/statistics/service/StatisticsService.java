@@ -47,11 +47,20 @@ public class StatisticsService {
         List<Integer> periodLengths = new ArrayList<>();
         Map<String, Long> symptomCount = new HashMap<>();
         for (int i = 1; i < chronological.size(); i++) {
-            cycleLengths.add(CycleCalculator.calculateCycleLength(chronological.get(i-1).getStartDate(), chronological.get(i).getStartDate()));
+            int len = CycleCalculator.calculateCycleLength(
+                    chronological.get(i - 1).getStartDate(),
+                    chronological.get(i).getStartDate());
+            if (len >= 15 && len <= 60) {
+                cycleLengths.add(len);
+            }
         }
         for (MenstrualRecord r : chronological) {
-            if (r.getStartDate() != null && r.getEndDate() != null)
-                periodLengths.add(CycleCalculator.calculatePeriodLength(r.getStartDate(), r.getEndDate()));
+            if (r.getStartDate() != null && r.getEndDate() != null) {
+                int len = CycleCalculator.calculatePeriodLength(r.getStartDate(), r.getEndDate());
+                if (len >= 1 && len <= 31) {
+                    periodLengths.add(len);
+                }
+            }
             countSymptoms(symptomCount, r.getSymptoms());
         }
         MenstrualRecord last = chronological.get(chronological.size() - 1);
@@ -67,10 +76,11 @@ public class StatisticsService {
         for (int i = startIdx; i < chronological.size(); i++) {
             MenstrualRecord r = chronological.get(i);
             Integer cycleLen = null;
-            for (int j = i; j >= 1; j--) {
-                if (chronological.get(j).getId().equals(r.getId())) {
-                    cycleLen = CycleCalculator.calculateCycleLength(chronological.get(j-1).getStartDate(), r.getStartDate());
-                    break;
+            if (i > 0) {
+                int len = CycleCalculator.calculateCycleLength(
+                        chronological.get(i - 1).getStartDate(), r.getStartDate());
+                if (len >= 15 && len <= 60) {
+                    cycleLen = len;
                 }
             }
             int periodLen = (r.getEndDate() != null) ? CycleCalculator.calculatePeriodLength(r.getStartDate(), r.getEndDate()) : 0;
@@ -85,8 +95,8 @@ public class StatisticsService {
                 .sorted((a,b) -> Long.compare(b.getCount(), a.getCount())).limit(10).collect(Collectors.toList());
         StatisticsOverviewDTO overview = StatisticsOverviewDTO.builder()
                 .totalCycles(cycleLengths.size()).totalRecords(records.size())
-                .avgCycleLength(cycleLengths.stream().mapToInt(Integer::intValue).average().orElse(0))
-                .avgPeriodLength(periodLengths.stream().mapToInt(Integer::intValue).average().orElse(0))
+                .avgCycleLength(cycleLengths.stream().mapToInt(Integer::intValue).average().orElse(28))
+                .avgPeriodLength(periodLengths.stream().mapToInt(Integer::intValue).average().orElse(5))
                 .minCycleLength(cycleLengths.stream().mapToInt(Integer::intValue).min().orElse(0))
                 .maxCycleLength(cycleLengths.stream().mapToInt(Integer::intValue).max().orElse(0))
                 .minPeriodLength(periodLengths.stream().mapToInt(Integer::intValue).min().orElse(0))

@@ -1,6 +1,7 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
-const FLOW_MAP = { LIGHT: '少', MEDIUM: '中', HEAVY: '多' }
+const FLOW_MAP = { LIGHT: '小', MEDIUM: '中', HEAVY: '大' }
 const PAIN_MAP = { NONE: '无', MILD: '轻微', MODERATE: '中等', SEVERE: '严重' }
 
 Page({
@@ -11,11 +12,22 @@ Page({
   },
 
   onShow() {
+    share.enableShareMenu()
     this.loadRecords()
   },
 
   onPullDownRefresh() {
     this.loadRecords()
+  },
+
+  // 分享功能
+  onShareAppMessage() {
+    return share.appMessage('墨鱼小日记')
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return share.timeline('墨鱼小日记')
   },
 
   async loadRecords() {
@@ -66,7 +78,6 @@ Page({
       wx.showToast({ title: '删除失败', icon: 'none' })
     }
   },
-
 
   refreshHome() {
     const pages = getCurrentPages()

@@ -2,7 +2,7 @@
   <view class="wxlogin-content">
     <view class="logo-section animate-fade-up">
       <view class="logo-emoji">🌸</view>
-      <text class="app-name">暖暖月经记录</text>
+      <text class="app-name">墨鱼小日记</text>
       <text class="app-desc">温柔记录 · 智能预测</text>
     </view>
 
@@ -11,11 +11,19 @@
         <text>{{loading ? "登录中..." : "微信一键登录"}}</text>
       </button>
       <view class="agreement">
-        <text>登录即表示同意</text>
-        <text class="link" bindtap="openAgreement">用户协议</text>
-        <text>和</text>
-        <text class="link" bindtap="openPrivacy">隐私政策</text>
+        <checkbox-group bindchange="onAgreeChange">
+          <label class="agreement-check">
+            <checkbox value="agree" checked="{{agreed}}" color="#ec407a" />
+            <text>我已阅读并同意</text>
+          </label>
+          <text class="link" bindtap="openAgreement">用户协议</text>
+          <text>和</text>
+          <text class="link" bindtap="openPrivacy">隐私政策</text>
+        </checkbox-group>
       </view>
+    </view>
+    <view class="icp-footer">
+      <text>粤ICP备2026120683号</text>
     </view>
   </view>
 </view>

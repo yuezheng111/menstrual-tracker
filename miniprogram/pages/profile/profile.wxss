@@ -46,6 +46,12 @@
   color: #c89bb8;
   padding-bottom: 40px;
 }
+.icp-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #b48aa8;
+  padding-bottom: 24px;
+}
 
 .admin-entry {
   margin: 20rpx 24rpx;

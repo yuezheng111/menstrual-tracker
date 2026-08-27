@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
 Page({
   data: {
@@ -12,17 +13,28 @@ Page({
     cycleDay: 0,
     cycleProgress: 0,
     statusText: '加载中...',
-    statusEmoji: '🌸',
+    statusEmoji: '😊',
     nextPeriodDays: null,
     prediction: {}
   },
 
   onShow() {
+    share.enableShareMenu()
     this.initStatusBar()
     this.setData({ nickname: wx.getStorageSync('nickname') || '用户' })
     this.setGreeting()
     this.refreshRole()
     this.loadData()
+  },
+
+  // 分享功能
+  onShareAppMessage() {
+    return share.appMessage('墨鱼小日记')
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return share.timeline('墨鱼小日记')
   },
 
   async refreshRole() {
@@ -86,7 +98,7 @@ Page({
   setGreeting() {
     const h = new Date().getHours()
     let g = '你好'
-    if (h < 6) g = '夜深了'
+    if (h < 6) g = '深夜好'
     else if (h < 9) g = '早上好'
     else if (h < 12) g = '上午好'
     else if (h < 14) g = '中午好'
@@ -127,20 +139,21 @@ Page({
           const next = new Date(o.nextPredictedStart)
           next.setHours(0, 0, 0, 0)
           nextDays = Math.round((next - today) / (1000 * 60 * 60 * 24))
+          if (nextDays < 0) nextDays = 0
         }
 
         // 状态判断
-        let statusText = '安全期 🌿'
-        let statusEmoji = '🌿'
+        let statusText = '安全期😊'
+        let statusEmoji = '😊'
         if (inPeriod) {
-          statusText = '经期中 💕'
-          statusEmoji = '💕'
+          statusText = '经期中🌸'
+          statusEmoji = '🌸'
         } else if (nextDays !== null && nextDays <= 5 && nextDays >= 0) {
           statusText = '即将到来 ⏰'
           statusEmoji = '⏰'
         } else if (o.ovulationStart && nextDays !== null && nextDays > 10 && nextDays < 18) {
-          statusText = '排卵期 🌸'
-          statusEmoji = '🌸'
+          statusText = '排卵期😊'
+          statusEmoji = '😊'
         }
 
         let progress = 0

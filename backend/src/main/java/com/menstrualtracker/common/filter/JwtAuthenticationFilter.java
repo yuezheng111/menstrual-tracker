@@ -67,11 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 2. 再查 Redis 会话映射
             Boolean sessionExists = cacheService.exists(tokenKey);
             if (sessionExists == null) {
-                log.warn("Redis unavailable; rejecting token to prevent stale-session access: userId={}", userId);
-                writeUnauthorized(response);
-                return;
-            }
-            if (!sessionExists) {
+                log.warn("Redis unavailable; falling back to JWT validation only: userId={}", userId);
+            } else if (!sessionExists) {
                 log.info("Token not found in Redis session (user logged out): userId={}", userId);
                 writeUnauthorized(response);
                 return;
@@ -100,6 +97,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "/api/auth/refresh-token".equals(request.getRequestURI())
+                || "/api/auth/refresh-token".equals(request.getServletPath());
     }
 
     private String extractToken(HttpServletRequest request) {

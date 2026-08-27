@@ -1,5 +1,5 @@
 {
-  "description": "暖暖经期记录",
+  "description": "墨鱼小日记",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -46,7 +46,7 @@
   "compileType": "miniprogram",
   "libVersion": "3.7.8",
   "appid": "wx339c6f90c14e1901",
-  "projectname": "暖暖经期记录",
+  "projectname": "墨鱼小日记",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",

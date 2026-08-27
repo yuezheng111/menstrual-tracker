@@ -17,7 +17,7 @@
     "pages/admin/exports/exports"
   ],
   "window": {
-    "navigationBarTitleText": "暖暖经期记录",
+    "navigationBarTitleText": "墨鱼小日记",
     "navigationBarTextStyle": "black",
     "navigationBarBackgroundColor": "#ffffff",
     "backgroundColor": "#fdf2f8",

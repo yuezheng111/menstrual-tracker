@@ -1,6 +1,6 @@
 <view class="admin-page">
   <view class="search-bar">
-    <input class="input-glass search-input" placeholder="搜索用户名" value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="onSearch" />
+    <input class="input-glass search-input" placeholder="搜索用户名/昵称" value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="onSearch" />
     <view class="search-btn" bindtap="onSearch">搜索</view>
     <view wx:if="{{keyword}}" class="clear-btn" bindtap="onClearSearch">✕</view>
   </view>
@@ -12,7 +12,7 @@
           {{item.username}}
           <text class="tag-role {{item.role === 'ADMIN' ? 'tag-admin' : ''}}">{{item.role}}</text>
         </view>
-        <view class="user-meta">记录 {{item.recordCount}} 条 · 注册于 {{item.createdAt ? item.createdAt.substring(0, 10) : '-'}}</view>
+        <view class="user-meta">昵称：{{item.nickname || '-'}} · 记录 {{item.recordCount}} 条 · 注册于 {{item.createdAt ? item.createdAt.substring(0, 10) : '-'}}</view>
       </view>
       <view class="user-actions">
         <view class="mini-btn {{item.enabled ? 'btn-warn' : 'btn-ok'}}" data-row="{{item}}" bindtap="toggleStatus">{{item.enabled ? '禁用' : '启用'}}</view>

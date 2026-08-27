@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
 Page({
   data: {
@@ -10,12 +11,23 @@ Page({
   },
 
   onShow() {
+    share.enableShareMenu()
     const role = wx.getStorageSync('role') || 'USER'
     if (role !== 'ADMIN') {
       wx.reLaunch({ url: '/pages/index/index' })
       return
     }
     this.loadProfile()
+  },
+
+  // 分享功能
+  onShareAppMessage() {
+    return share.appMessage('墨鱼小日记')
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return share.timeline('墨鱼小日记')
   },
 
   async loadProfile() {

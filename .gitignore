@@ -1,50 +1,72 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+.vscode/
+
+# Build outputs
+target/
+build/
+dist/
+out/
+node_modules/
+__pycache__/
 *.class
 *.jar
 *.war
-*.log
-target/
-.idea/
-*.iml
-.DS_Store
-node_modules/
-dist/
-.vscode/
-__pycache__/
 *.pyc
 *.pyo
-temp_gen.py
-generate_files.py
 
-# AI 助手临时文件
+# Logs and temporary files
+*.log
+*.err
+logs/
+tmp/
+dev-check.txt
+
+# Backups
+*.bak
+*.orig
+*.rej
+*~
+*_backup_*/
+backup/
+
+# Local environment and secrets
+.env
+*.env
+application-local.yml
+project.private.config.json
+moyoo.asia_nginx/
+*.pem
+*.key
+*.crt
+*.csr
+
+# Archives
+*.tar.gz
+*.zip
+
+# Local AI helpers and generated scripts
+.agents/
+.codex/
 fix_*.py
 write_css*.py
 generate_*.py
 temp_*.py
-*.log
-*.err
-.agents/
-.codex/
-
-
-# WeChat DevTools private config (contains local debug info, do not commit)
-project.private.config.json
-
-# Local environment files
-.env
-*.env
-
-# Local-only Spring config
-application-local.yml
-
-
-# Config files containing plaintext credentials (do not commit)
-backend/src/main/resources/application.yml
-backend/src/main/resources/application-dev.yml
-backend/src/main/resources/application-prod.yml
-docker-compose.yml
-backend/src/main/java/com/menstrualtracker/common/config/DataInitializer.java
-
-
-# Archive files
-*.tar.gz
-*.zip
+temp_gen.py
+generate_files.py
+/COMPLETION_REPORT.md
+/IMPLEMENTATION_STATUS.md
+/PROJECT_SUMMARY.md
+/QUICK_START.md
+/TESTING_GUIDE.md
+/VERIFICATION_REPORT.md
+/final_check.ps1
+/final_encoding_check.ps1
+/verify_fixes.ps1
+/verify_encoding.ps1
+/test_fixes.ps1
+/test_functionality.ps1
+/test_integration.ps1

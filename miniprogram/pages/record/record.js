@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+const share = require('../../utils/share')
 
 Page({
   data: {
@@ -30,6 +31,16 @@ Page({
     ],
     symptomOptions: ['头痛','疲劳','腹胀','腹痛','背痛','恶心','头晕','长痘','乳房胀痛','失眠'],
     moodOptions: ['开心','难过','焦虑','易怒','平静','精力充沛','情绪化','疲惫','专注','压力大']
+  },
+
+  // 分享功能
+  onShareAppMessage() {
+    return share.appMessage('墨鱼小日记')
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return share.timeline('墨鱼小日记')
   },
 
   confirmDelete() {
@@ -67,6 +78,7 @@ Page({
   },
 
   onLoad(options) {
+    share.enableShareMenu()
     if (options.id) {
       this.setData({ isEditing: true, recordId: options.id })
       this.loadRecord(options.id)

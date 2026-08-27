@@ -1,0 +1,86 @@
+<view class="doc-page">
+  <view class="doc-title">隐私政策</view>
+  <view class="doc-update">生效日期：2026年8月13日</view>
+
+  <view class="doc-section">
+    <text class="doc-h">一、引言</text>
+    <text class="doc-p">本隐私政策适用于“墨鱼小日记”小程序。我们重视你的个人信息与隐私保护，将依法收集、使用、存储和共享你的信息。经期、症状、情绪等健康相关数据属于敏感个人信息，我们会以更高标准保护。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">二、我们收集的信息</text>
+    <text class="doc-p">1. 账号信息：通过微信授权登录时，微信会向本小程序提供登录凭证，我们据此获取用于识别你账号的微信身份标识，并生成用户名、角色等账号信息。</text>
+    <text class="doc-p">2. 你主动填写的记录信息：经期开始日期、结束日期、流量、痛经程度、颜色、血块、症状、情绪、备注等。</text>
+    <text class="doc-p">3. 预测与统计结果：基于你的记录生成的预测和统计数据。</text>
+    <text class="doc-p">4. 设备与日志信息：为保障服务安全和排查问题，我们可能记录设备型号、系统版本、请求时间、接口地址、IP地址等基础日志信息。</text>
+    <text class="doc-p">5. 客服与反馈信息：当你联系我们时，我们可能收集你主动提供的联系方式和问题描述。</text>
+    <text class="doc-p">6. 我们当前不会申请位置、相册、摄像头、通讯录等敏感权限，也不会读取你手机中的其他个人信息。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">三、信息的使用目的</text>
+    <text class="doc-p">1. 提供登录、经期记录、周期预测、统计分析、记录管理等服务功能。</text>
+    <text class="doc-p">2. 保障服务安全，进行限流、防滥用、异常登录识别和故障排查。</text>
+    <text class="doc-p">3. 改进产品功能，例如分析记录数据的整体规律，但不会用于识别特定个人身份。</text>
+    <text class="doc-p">4. 应法律法规要求或配合监管、司法调查。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">四、信息的存储</text>
+    <text class="doc-p">1. 存储地点：你的数据存储在本小程序运营所使用的服务器上，服务器位于中国境内。</text>
+    <text class="doc-p">2. 存储期限：我们仅在实现本政策所述目的所必需的期限内保留数据。你主动删除记录后，相关记录在界面内不可见；出于安全审计、反滥用和合规需要，删除后的数据可能继续保留一段时间，并在保留期限届满后删除或匿名化。</text>
+    <text class="doc-p">3. 你注销账号时，我们会依法处理你的账号和个人数据，具体处理方式可联系我们咨询。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">五、信息的共享、转让与公开披露</text>
+    <text class="doc-p">1. 我们不会出售你的个人信息，也不会将你的经期、健康类数据用于广告或商业营销。</text>
+    <text class="doc-p">2. 为提供登录功能，微信登录过程需要与微信平台交互，微信将按照其自身规则处理相应登录信息。</text>
+    <text class="doc-p">3. 我们可能使用云服务器等第三方技术服务商托管数据，这类服务商仅按我们的指示处理数据，并受保密与安全义务约束。</text>
+    <text class="doc-p">4. 仅在以下情形我们才可能披露你的信息：获得你的明确同意；法律法规、司法或行政机关依法要求；为保护用户、公众或我们的合法权益所必需且符合法律规定。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">六、信息安全</text>
+    <text class="doc-p">1. 我们采取访问控制、身份认证、限流防护、日志审计等技术和管理措施保护数据安全。</text>
+    <text class="doc-p">2. 密码等敏感信息会经过不可逆加密后存储，我们不会以明文形式保存你的密码。</text>
+    <text class="doc-p">3. 尽管我们尽力保护数据安全，但任何网络传输和存储都无法保证绝对安全。如发生个人信息安全事件，我们将依法及时处置并履行通知义务。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">七、你的权利</text>
+    <text class="doc-p">1. 查询与更正：你可以查看和修改自己的记录、昵称等资料。</text>
+    <text class="doc-p">2. 删除：你可以删除经期记录，删除后界面内不再显示。</text>
+    <text class="doc-p">3. 导出：我们提供记录数据导出能力，你可以按需导出自己的数据。</text>
+    <text class="doc-p">4. 撤回授权：你可以通过退出登录、删除小程序等方式停止使用，并在微信设置中管理相关授权。</text>
+    <text class="doc-p">5. 注销账号：如需注销账号或删除全部个人数据，请通过客服渠道申请，我们将在核实身份后依法处理。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">八、Cookie 与本地存储</text>
+    <text class="doc-p">本小程序会在你的微信本地缓存登录凭证等必要信息，用于保持登录状态。你可以通过退出登录清理相关缓存。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">九、未成年人保护</text>
+    <text class="doc-p">本小程序主要面向成年用户。未满十四周岁的未成年人应在监护人阅读并同意本政策后，在监护人指导下使用；监护人应帮助未成年人妥善管理账号和记录数据。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">十、政策更新</text>
+    <text class="doc-p">我们可能根据法律法规或业务变化更新本政策。重大变更会通过小程序内公告等方式提示，更新后的政策自公布时或注明的生效日期起生效。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">十一、法律适用与争议解决</text>
+    <text class="doc-p">本政策适用中华人民共和国法律。因本政策产生的争议，双方应友好协商；协商不成的，可向本小程序运营方所在地有管辖权的人民法院提起诉讼。</text>
+  </view>
+
+  <view class="doc-section">
+    <text class="doc-h">十二、联系方式</text>
+    <text class="doc-p">如你对本政策或个人信息保护有任何疑问、意见或投诉，请通过小程序内公布的客服渠道联系我们。我们会在核实身份后于合理期限内回复。</text>
+  </view>
+  <view class="icp-footer">
+    <text>粤ICP备2026120683号</text>
+  </view>
+</view>
